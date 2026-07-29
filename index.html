@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="包含 115 道高频数仓面试题、SQL 手撕题与模拟面试的离线秋招背诵工具。">
+  <title>数仓秋招面试背诵助手</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;600&family=Noto+Serif+SC:wght@600;900&display=swap">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #faf7f0;
+      --surface: #fffdf8;
+      --surface-2: #f4efe3;
+      --surface-3: #eae3d0;
+      --text: #211c14;
+      --muted: #716a58;
+      --line: #e3dcc7;
+      --primary: #14532d;
+      --primary-2: #0d3b1f;
+      --primary-soft: #e7eee0;
+      --accent: #b45309;
+      --danger: #b3402a;
+      --learning: #9a6a12;
+      --learning-soft: #f6ecd2;
+      --mastered: #1c5c35;
+      --mastered-soft: #e1ecdc;
+      --code-bg: #f2ecdd;
+      --code-text: #2d2617;
+      --shadow: 0 16px 38px rgba(33, 28, 20, .12);
+      --radius: 12px;
+      --sidebar: 300px;
+      --font-serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    [data-theme="light"] { color-scheme: light; }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #16130e;
+      --surface: #201b13;
+      --surface-2: #2a2318;
+      --surface-3: #352d1f;
+      --text: #ede5d3;
+      --muted: #a79b81;
+      --line: #3a3225;
+      --primary: #8fc7a5;
+      --primary-2: #abdcbf;
+      --primary-soft: #28351f;
+      --accent: #d99a4e;
+      --danger: #e07a5f;
+      --learning: #d9a94e;
+      --learning-soft: #3c3115;
+      --mastered: #8fc7a5;
+      --mastered-soft: #28351f;
+      --code-bg: #14110b;
+      --code-text: #ddd2b9;
+      --shadow: 0 20px 48px rgba(0, 0, 0, .45);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: .012em;
+      transition: background .2s ease, color .2s ease;
+    }
+    ::selection { background: var(--primary-soft); color: var(--text); }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--primary);
+      outline: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
+      outline-offset: 2px;
+    }
+    .app { min-height: 100vh; }
+
+    /* ============ 侧边栏 · 刊头与目录 ============ */
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 30;
+      width: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+    }
+    .brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--line); }
+    .brand-kicker { color: var(--primary); font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .24em; }
+    .brand h1 { margin: 10px 0 0; font-family: var(--font-serif); font-weight: 900; font-size: 26px; line-height: 1.3; letter-spacing: .02em; }
+    .brand-issue { margin-top: 10px; color: var(--muted); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; }
+    .brand p { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
+    .side-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 18px; }
+    .side-special { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .side-btn, .category-head, .question-link {
+      width: 100%; border: 0; background: transparent; cursor: pointer; text-align: left;
+    }
+    .side-btn {
+      padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: transparent;
+      color: var(--muted); font-weight: 600; font-size: 13px; transition: border-color .15s ease, color .15s ease, background .15s ease;
+    }
+    .side-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .side-btn.active { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+    .side-btn span { font-family: var(--font-mono); font-size: 11px; }
+    .category-group { margin: 0; border-bottom: 1px solid var(--line); }
+    .category-group:last-child { border-bottom: 0; }
+    .category-head { list-style: none; display: flex; align-items: center; gap: 9px; padding: 11px 6px; font-weight: 600; font-size: 13.5px; }
+    .category-head::-webkit-details-marker { display: none; }
+    .category-head:hover { color: var(--primary); }
+    .category-name { flex: 1; min-width: 0; }
+    .category-count { flex: 0 0 auto; color: var(--muted); font-family: var(--font-mono); font-size: 10.5px; font-weight: 400; }
+    .category-head::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(-45deg); transition: transform .15s ease; }
+    details[open] > .category-head::before { transform: rotate(45deg); }
+    .question-links { padding: 0 4px 11px 25px; }
+    .question-link {
+      display: block; padding: 5px 7px; border-radius: 6px; color: var(--muted); font-size: 12.5px; line-height: 1.5;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .question-link:hover { background: var(--surface-2); color: var(--text); }
+    .side-footer { padding: 13px 18px; border-top: 1px solid var(--line); color: var(--muted); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; }
+
+    /* ============ 顶栏 ============ */
+    .main { margin-left: var(--sidebar); min-width: 0; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr minmax(0, 680px) 1fr; align-items: center; gap: 12px;
+      padding: 13px clamp(18px, 3vw, 40px); background: var(--bg); background: color-mix(in srgb, var(--bg) 86%, transparent);
+      border-bottom: 1px solid var(--line); backdrop-filter: blur(14px);
+    }
+    .topbar-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .topbar-left { justify-content: flex-start; }
+    .topbar-right { justify-content: flex-end; }
+    .search-wrap { position: relative; width: 100%; min-width: 0; }
+    .search-icon { position: absolute; left: 14px; top: 50%; z-index: 1; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .search {
+      width: 100%; min-height: 42px; padding: 8px 14px 8px 42px; border: 1px solid var(--line); border-radius: 10px;
+      background: var(--surface); color: var(--text);
+    }
+    .search::placeholder { color: var(--muted); }
+    .btn {
+      min-height: 40px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 9px;
+      background: var(--surface); cursor: pointer; font-weight: 600; letter-spacing: .02em; white-space: nowrap;
+      transition: border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+    }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { border-color: var(--primary); background: var(--primary); color: #fdfcf7; }
+    .btn.primary:hover { background: var(--primary-2); color: #fdfcf7; }
+    [data-theme="dark"] .btn.primary { color: #101c10; }
+    [data-theme="dark"] .btn.primary:hover { color: #101c10; }
+    .btn.ghost { background: transparent; }
+    .icon-btn { width: 40px; padding: 0; display: grid; place-items: center; }
+    .svg-icon { width: 19px; height: 19px; display: inline-block; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .theme-btn .svg-icon { margin-right: 4px; }
+    .mobile-menu { display: none; }
+
+    /* ============ Dashboard · 本期进度 ============ */
+    .content { width: min(1120px, 100%); margin: 0 auto; padding: 28px clamp(18px, 3vw, 40px) 80px; }
+    .dashboard {
+      padding: 28px clamp(20px, 3vw, 34px); border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .dashboard-top { display: flex; align-items: flex-start; gap: 28px; }
+    .progress-ring {
+      --pct: 0%; flex: 0 0 auto; width: 118px; height: 118px; display: grid; place-items: center; border-radius: 50%;
+      background: conic-gradient(var(--primary) var(--pct), var(--surface-3) 0); position: relative;
+    }
+    .progress-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--surface); }
+    .ring-label { position: relative; text-align: center; font-family: var(--font-serif); font-weight: 900; font-size: 30px; line-height: 1.05; }
+    .ring-label small { display: block; margin-top: 6px; color: var(--muted); font-family: var(--font-sans); font-size: 10.5px; font-weight: 600; letter-spacing: .14em; }
+    .dashboard-copy { flex: 1; min-width: 0; }
+    .dashboard-copy h2 { margin: 2px 0 5px; font-family: var(--font-serif); font-weight: 900; font-size: clamp(22px, 3vw, 30px); letter-spacing: .02em; }
+    .dashboard-copy p { margin: 0; color: var(--muted); font-size: 13.5px; }
+    .stat-row { display: flex; flex-wrap: wrap; margin-top: 18px; }
+    .stat { padding: 2px 20px 2px 0; }
+    .stat + .stat { padding-left: 20px; border-left: 1px solid var(--line); }
+    .stat b { display: block; font-family: var(--font-serif); font-weight: 900; font-size: 26px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 11px; letter-spacing: .14em; }
+    .module-progress { counter-reset: mod; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 36px; margin-top: 24px; padding-top: 4px; border-top: 1px solid var(--line); }
+    .module-item { min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .module-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 12.5px; font-weight: 500; }
+    .module-meta span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .module-meta span:first-child::before { counter-increment: mod; content: counter(mod, decimal-leading-zero); margin-right: 9px; color: var(--muted); font-family: var(--font-mono); font-size: 10px; font-weight: 400; }
+    .module-meta span:last-child { color: var(--muted); font-family: var(--font-mono); font-size: 10.5px; }
+    .bar { height: 2px; margin-top: 7px; background: var(--surface-3); }
+    .bar > i { display: block; height: 100%; background: var(--primary); }
+
+    /* ============ 筛选工具栏 ============ */
+    .toolbar { margin: 20px 0 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    .mobile-filter-toggle { display: none; width: 100%; }
+    .mobile-filter-toggle::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s ease; }
+    .mobile-filter-toggle[aria-expanded="true"]::after { transform: translateY(2px) rotate(225deg); }
+    .filter-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .filter-label { color: var(--muted); font-size: 11.5px; letter-spacing: .12em; }
+    .select { min-height: 36px; padding: 5px 30px 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 13px; }
+    .check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; }
+    .check input { width: 16px; height: 16px; accent-color: var(--primary); }
+    .toolbar-actions { margin-left: auto; display: flex; gap: 8px; }
+    .small-btn { min-height: 34px; padding: 5px 10px; font-size: 12.5px; }
+    .result-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 22px 2px 12px; }
+    .result-title { font-family: var(--font-serif); font-weight: 900; font-size: 18px; letter-spacing: .02em; }
+    .result-sub { color: var(--muted); font-size: 12.5px; }
+    #resultCount { font-family: var(--font-mono); font-size: 11.5px; }
+
+    /* ============ 题目卡片 ============ */
+    .question-list { display: grid; gap: 16px; }
+    @keyframes card-in { from { opacity: 0; transform: translateY(14px); } }
+    .card {
+      scroll-margin-top: 84px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+      overflow: hidden; transition: transform .18s ease, box-shadow .18s ease;
+      animation: card-in .55s cubic-bezier(.2, .7, .3, 1) both; animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .card[data-status="learning"] { border-left: 3px solid var(--learning); }
+    .card[data-status="mastered"] { border-left: 3px solid var(--mastered); }
+    .card-head { padding: 22px 24px 18px; }
+    .meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .category-pill { padding: 4px 9px; border-radius: 4px; background: var(--primary-soft); color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+    .qid { color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; }
+    .stars { display: inline-flex; gap: 1.5px; color: var(--accent); }
+    .rating-star { width: 12.5px; height: 12.5px; stroke: currentColor; stroke-width: 1.8; }
+    .rating-star.filled { fill: currentColor; }
+    .favorite { margin-left: auto; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; color: var(--muted); display: grid; place-items: center; transition: color .15s ease, background .15s ease; }
+    .favorite .svg-icon { width: 20px; height: 20px; }
+    .favorite.active .svg-icon { fill: currentColor; }
+    .favorite.active { color: var(--accent); background: var(--learning-soft); }
+    .question { margin: 0; font-family: var(--font-serif); font-weight: 600; font-size: clamp(18px, 2vw, 21px); line-height: 1.6; letter-spacing: .01em; }
+    mark { padding: 0 2px; border-radius: 3px; background: #f5e0a0; color: #2d2105; }
+    .card-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .status-group { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); }
+    .status-btn { min-height: 30px; padding: 4px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; transition: color .15s ease, background .15s ease; }
+    .status-btn.active[data-value="unlearned"] { color: var(--text); background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .status-btn.active[data-value="learning"] { color: var(--learning); background: var(--learning-soft); }
+    .status-btn.active[data-value="mastered"] { color: var(--mastered); background: var(--mastered-soft); }
+    .reveal-btn { margin-left: auto; }
+
+    /* ============ 答案与解析 ============ */
+    .answer-panel { padding: 0 24px 22px; border-top: 1px solid var(--line); }
+    .answer-block { margin-top: 18px; padding: 18px 20px; border-radius: 10px; background: var(--primary-soft); }
+    .answer-label, .detail-label { margin-bottom: 8px; color: var(--primary); font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .16em; }
+    .answer-text { white-space: pre-wrap; }
+    .detail-toggle { margin-top: 14px; }
+    .detail-block { margin-top: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+    .detail-text { white-space: pre-wrap; }
+    pre { max-width: 100%; overflow-x: auto; margin: 12px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); color: var(--code-text); font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; white-space: pre; tab-size: 2; }
+    .follow-up { margin: 14px 0 0; padding-left: 22px; }
+    .follow-up li { margin: 6px 0; }
+    .follow-up li::marker { color: var(--primary); font-family: var(--font-mono); font-size: 11px; }
+    .fq summary { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; border-radius: 6px; }
+    .fq summary::-webkit-details-marker { display: none; }
+    .fq summary:hover { color: var(--primary); }
+    .fq summary::after { content: "+"; flex: 0 0 auto; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+    .fq[open] summary::after { content: "–"; }
+    .fq-hint { margin: 8px 0 6px; padding: 10px 14px; border-left: 2px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--surface); color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .fq-hint::before { content: "思路 · "; color: var(--accent); font-weight: 600; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .tag { padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 11px; letter-spacing: .03em; }
+    .empty { padding: 60px 20px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface); text-align: center; }
+    .empty h3 { margin: 0 0 7px; font-family: var(--font-serif); font-weight: 900; }
+    .empty p { margin: 0 0 16px; color: var(--muted); }
+
+    /* ============ 模拟面试 ============ */
+    .drawer-mask { display: none; }
+    .modal { position: fixed; inset: 0; z-index: 100; display: grid; background: var(--bg); overflow-y: auto; }
+    .modal[hidden] { display: none; }
+    .modal-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 15px clamp(18px, 4vw, 44px); border-bottom: 1px solid var(--line); background: var(--bg); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(14px); }
+    .modal-head h2 { margin: 0; font-family: var(--font-serif); font-weight: 900; font-size: 19px; letter-spacing: .02em; }
+    .interview-wrap { width: min(840px, 100%); margin: auto; padding: 36px 20px 64px; }
+    .setup-card, .interview-card, .summary-card { padding: clamp(22px, 4vw, 40px); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+    .setup-card h3, .interview-card h3, .summary-card h3 { margin-top: 0; font-family: var(--font-serif); font-weight: 900; font-size: 21px; }
+    .setup-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0 20px; }
+    .setup-option { display: flex; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; cursor: pointer; font-size: 13.5px; transition: border-color .15s ease; }
+    .setup-option:hover { border-color: var(--primary); }
+    .interview-counter { color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; }
+    .interview-question { margin: 22px 0 26px; font-family: var(--font-serif); font-weight: 600; font-size: clamp(23px, 4vw, 33px); line-height: 1.5; letter-spacing: .01em; }
+    .interview-answer { margin: 18px 0; padding: 20px 22px; border-radius: 10px; background: var(--primary-soft); white-space: pre-wrap; }
+    .interview-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0; }
+    .summary-stat { padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); text-align: center; color: var(--muted); font-size: 11.5px; letter-spacing: .12em; }
+    .summary-stat b { display: block; margin-bottom: 4px; color: var(--primary); font-family: var(--font-serif); font-weight: 900; font-size: 30px; }
+
+    /* ============ 杂项 ============ */
+    .toast { position: fixed; left: 50%; bottom: 28px; z-index: 200; transform: translate(-50%, 20px); padding: 10px 18px; border-radius: 8px; background: #211c14; color: #f5f1e6; font-size: 13px; letter-spacing: .02em; opacity: 0; pointer-events: none; transition: .2s ease; box-shadow: var(--shadow); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .muted { color: var(--muted); }
+    .storage-warning { color: var(--danger); font-weight: 600; }
+    [hidden] { display: none !important; }
+    body.modal-open { overflow: hidden; }
+
+    @media (max-width: 980px) {
+      .module-progress { grid-template-columns: repeat(2, 1fr); }
+      .toolbar-actions { width: 100%; margin-left: 0; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 14px; }
+      .sidebar { transform: translateX(-102%); transition: transform .2s ease; box-shadow: var(--shadow); }
+      body.drawer-open .sidebar { transform: translateX(0); }
+      .drawer-mask { position: fixed; inset: 0; z-index: 25; background: rgba(20, 16, 10, .42); }
+      body.drawer-open .drawer-mask { display: block; }
+      .main { margin-left: 0; }
+      .mobile-menu { display: grid; }
+      .topbar { display: flex; padding: 9px 12px; }
+      .topbar-side { display: contents; }
+      .search-wrap { flex: 1; }
+      .theme-btn .theme-text { display: none; }
+      .top-interview { padding-inline: 10px; }
+      .content { padding: 18px 12px 60px; }
+      .dashboard { padding: 20px; }
+      .dashboard-top { align-items: center; gap: 20px; }
+      .progress-ring { width: 92px; height: 92px; }
+      .ring-label { font-size: 24px; }
+      .stat b { font-size: 22px; }
+      .stat { padding-right: 14px; }
+      .stat + .stat { padding-left: 14px; }
+      .module-progress { grid-template-columns: 1fr; }
+      .filter-row { align-items: stretch; }
+      .mobile-filter-toggle { display: block; }
+      .toolbar .filter-row { display: none; margin-top: 12px; }
+      .toolbar.filters-open .filter-row { display: flex; }
+      .filter-row > .filter-label { width: 100%; }
+      .select { flex: 1; min-width: 130px; }
+      .toolbar-actions .btn { flex: 1; }
+      .card-head { padding: 18px 18px 14px; }
+      .answer-panel { padding: 0 18px 18px; }
+      .reveal-btn { width: 100%; margin-left: 0; }
+      .setup-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 430px) {
+      .dashboard-top { align-items: flex-start; }
+      .progress-ring { width: 80px; height: 80px; }
+      .ring-label { font-size: 21px; }
+      .dashboard-copy p { display: none; }
+      .status-group { width: 100%; }
+      .status-btn { flex: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+    @media print {
+      :root { color-scheme: light; --bg: #fff; --surface: #fff; --surface-2: #f7f7f7; --text: #111; --muted: #555; --line: #ccc; --primary-soft: #f2f7f5; --code-bg: #f3f5f4; --code-text: #111; }
+      .sidebar, .topbar, .toolbar, .drawer-mask, .favorite, .card-controls, .modal, .toast { display: none !important; }
+      .main { margin-left: 0; }
+      .content { width: 100%; padding: 0; }
+      .dashboard { box-shadow: none; break-inside: avoid; }
+      .card { box-shadow: none; break-inside: avoid; animation: none !important; opacity: 1 !important; transform: none !important; }
+      .answer-panel[hidden], .detail-block[hidden] { display: block !important; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="appRoot">
+    <aside class="sidebar" id="sidebar" aria-label="题库导航">
+      <div class="brand">
+        <div class="brand-kicker">DATA WAREHOUSE</div>
+        <h1>数仓秋招背诵助手</h1>
+        <div class="brand-issue">VOL.2025 · 秋招特辑</div>
+        <p>高频八股 · SQL 手撕 · 项目表达</p>
+      </div>
+      <div class="side-scroll">
+        <div class="side-special">
+          <button class="side-btn active" data-nav="all">全部 <span id="allCount"></span></button>
+          <button class="side-btn" data-nav="favorites">收藏 <span id="favoriteCount"></span></button>
+        </div>
+        <nav id="categoryNav"></nav>
+      </div>
+      <div class="side-footer" id="storageNote">进度保存在当前浏览器 · 离线可用</div>
+    </aside>
+    <div class="drawer-mask" id="drawerMask"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-side topbar-left">
+          <button class="btn icon-btn mobile-menu" id="menuBtn" aria-label="打开题库导航"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        </div>
+        <label class="search-wrap">
+          <svg class="svg-icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input class="search" id="searchInput" type="search" aria-label="搜索题目、答案、解析、追问或标签" placeholder="搜索题目、答案、解析、追问或标签…" autocomplete="off">
+        </label>
+        <div class="topbar-side topbar-right">
+          <button class="btn theme-btn" id="themeBtn" title="切换主题" aria-label="当前主题：跟随系统，点击切换"><span id="themeIcon"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16A8 8 0 0 0 12 4Z"/></svg></span> <span class="theme-text" id="themeText">跟随系统</span></button>
+        <button class="btn primary top-interview" id="openInterviewBtn">模拟面试</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="dashboard" aria-labelledby="dashboardTitle">
+          <div class="dashboard-top">
+            <div class="progress-ring" id="progressRing"><div class="ring-label"><span id="progressPercent">0%</span><small>已掌握</small></div></div>
+            <div class="dashboard-copy">
+              <h2 id="dashboardTitle">今天也向 Offer 靠近一点</h2>
+              <p>先独立作答，再翻看标准答案；真正掌握的标准是能讲清原理与取舍。</p>
+              <div class="stat-row" id="statRow"></div>
+            </div>
+          </div>
+          <div class="module-progress" id="moduleProgress"></div>
+        </section>
+
+        <section class="toolbar" aria-label="题目筛选">
+          <button class="btn small-btn mobile-filter-toggle" id="mobileFilterToggle" aria-expanded="false">筛选与批量操作</button>
+          <div class="filter-row">
+            <span class="filter-label">组合筛选</span>
+            <select class="select" id="frequencyFilter" aria-label="最低考察频率">
+              <option value="1">全部题目（3–5 星）</option><option value="4">4 星以上 · 高频</option><option value="5">只看 5 星 · 必考</option>
+            </select>
+            <select class="select" id="statusFilter" aria-label="掌握状态">
+              <option value="all">全部状态</option><option value="unlearned">未学习</option><option value="learning">学习中</option><option value="mastered">已掌握</option>
+            </select>
+            <label class="check"><input type="checkbox" id="favoriteOnly"> 仅看收藏</label>
+            <div class="toolbar-actions">
+              <button class="btn small-btn" id="expandAllBtn">全部展开</button>
+              <button class="btn small-btn" id="collapseAllBtn">全部收起</button>
+              <button class="btn small-btn ghost" id="resetFiltersBtn">重置筛选</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="result-line">
+          <div><span class="result-title" id="viewTitle">全部题目</span> <span class="result-sub" id="resultCount" aria-live="polite" aria-atomic="true" tabindex="-1"></span></div>
+          <span class="result-sub" id="searchHint"></span>
+        </div>
+        <section class="question-list" id="questionList"></section>
+      </div>
+    </main>
+  </div>
+
+  <section class="modal" id="interviewModal" role="dialog" aria-modal="true" aria-labelledby="interviewTitle" hidden>
+    <header class="modal-head"><h2 id="interviewTitle">模拟面试</h2><button class="btn icon-btn" id="closeInterviewBtn" aria-label="关闭模拟面试"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+    <div class="interview-wrap">
+      <div class="setup-card" id="interviewSetup">
+        <h3>设置本轮题目范围</h3>
+        <p class="muted">选择模块和最低频率，本轮随机且不重复。</p>
+        <label class="check"><input type="checkbox" id="selectAllInterview" checked> 全选 / 全不选</label>
+        <div class="setup-grid" id="interviewCategories"></div>
+        <label>最低频率
+          <select class="select" id="interviewFrequency"><option value="1">全部题目（3–5 星）</option><option value="4" selected>4 星以上 · 高频</option><option value="5">只看 5 星 · 必考</option></select>
+        </label>
+        <button class="btn primary" id="startInterviewBtn" style="width:100%;margin-top:22px">开始抽题</button>
+      </div>
+      <div class="interview-card" id="interviewCard" hidden>
+        <div class="interview-counter" id="interviewCounter"></div>
+        <div class="meta-row"><span class="category-pill" id="interviewCategory"></span><span class="stars" id="interviewStars"></span><button class="favorite" id="interviewFavorite" aria-label="收藏此题"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg></button></div>
+        <h3 class="interview-question" id="interviewQuestion"></h3>
+        <div class="interview-answer" id="interviewAnswer" hidden></div>
+        <div class="interview-actions">
+          <div class="status-group" id="interviewStatus"></div>
+          <button class="btn" id="revealInterviewBtn">翻看答案</button>
+          <button class="btn primary" id="nextInterviewBtn" hidden>下一题</button>
+        </div>
+      </div>
+      <div class="summary-card" id="interviewSummary" hidden>
+        <h3>本轮复盘</h3>
+        <p class="muted" id="interviewSummaryText"></p>
+        <div class="summary-grid" id="interviewSummaryStats"></div>
+        <div class="interview-actions">
+          <button class="btn primary" id="restartInterviewBtn">重新设置题目</button>
+          <button class="btn" id="closeSummaryBtn">结束面试</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+  const QUESTIONS = [
+    {
+      id: "BAS-001", category: "数仓基础概念", question: "你怎么理解数据仓库？它和业务数据库的核心区别是什么？", frequency: 5,
+      answer: `①数据库面向交易，追求单条增删改低延迟和强一致；数仓面向分析，追求海量数据扫描、聚合与历史追溯。②数据库按业务流程和范式建模，数仓按分析主题整合并常用维度建模。③数据库保存当前细节，数仓沉淀跨系统、随时间变化且相对稳定的数据。`,
+      detail: `数据库解决“把业务办成”，例如下单、支付；数据仓库解决“看清业务”，例如分析渠道转化和用户复购。二者不是替代关系：业务库是重要数据源，数仓通过同步、清洗、建模形成统一分析底座。实际架构中还会通过读写隔离避免分析查询拖慢在线交易。`,
+      followUp: [{ q: "为什么不直接在 MySQL 上做所有报表？", a: "从资源隔离和负载特性切入：大范围聚合扫描会挤占在线事务的 CPU、IO 和缓冲池，拖慢交易；再补一句行存加索引为点查优化、不擅长分析型扫描，所以实践中用只读副本或数仓把报表负载分流出去。" }, { q: "数仓一定不能更新数据吗？", a: "先纠正“只读”误解：相对稳定指使用模式以查询为主、不做高频行级事务更新，而非禁止更新；举迟到数据修正、拉链闭链、历史回刷三类受控更新，落点在更新必须走调度、可审计、可重放。" }], tags: ["数据库", "数据仓库", "OLTP", "OLAP"]
+    },
+    {
+      id: "BAS-002", category: "数仓基础概念", question: "OLTP 和 OLAP 有什么区别？请从工作负载角度回答。", frequency: 5,
+      answer: `①OLTP 服务高并发短事务，访问少量行，以点查和增删改为主，强调毫秒响应、强一致与可用性。②OLAP 服务低并发复杂查询，扫描大量历史数据，以关联、聚合为主，强调吞吐和分析效率。③前者常用行存、索引和范式模型，后者偏列存、分区及星型模型。`,
+      detail: `OLTP 典型系统是订单库和账户库，一次事务短且边界明确；OLAP 典型系统是 Hive、ClickHouse、Doris。HTAP 尝试在一套系统同时承载两类负载，但在大规模企业实践中，通常仍通过数据同步把交易与分析隔离，以获得更确定的性能和治理边界。`,
+      followUp: [{ q: "列式存储为什么适合 OLAP？", a: "从 IO 和计算两个角度答：分析查询通常只取少数列，列存按列读取避免整行 IO，同列类型一致压缩率高；再补向量化执行、谓词下推等机制进一步放大扫描与聚合效率。" }, { q: "什么是 HTAP？", a: "一句话定义：一套系统同时承载交易与分析负载。实现思路可提行列混存、副本异步转换或统一计算引擎；现实约束是一致性与资源隔离难兼顾，落地多为“准实时分析”，并不是要替代数仓。" }], tags: ["OLTP", "OLAP", "行存", "列存"]
+    },
+    {
+      id: "BAS-003", category: "数仓基础概念", question: "数据仓库的四大特征是什么？", frequency: 5,
+      answer: `①面向主题：围绕用户、商品、交易等分析主题组织，而非照搬业务系统。②集成性：统一多源编码、口径和主数据。③相对稳定：数据进入后以查询为主，通常不做频繁事务更新。④随时间变化：保存历史快照或变更轨迹，并用时间字段支持趋势与追溯分析。`,
+      detail: `四个特征来自 Inmon 的经典定义。面向主题决定组织方式，集成性解决多源异构，相对稳定描述使用模式，随时间变化体现历史价值。“稳定”不是绝对不更新，迟到数据修正、拉链闭链和回刷都会更新，但应受控、可审计、可重放。`,
+      followUp: [{ q: "相对稳定是否等于只追加不更新？", a: "不等于。“稳定”描述的是使用模式：以查询为主、没有在线行级事务；但迟到修正、拉链闭链、错误回刷都会合法地更新数据，关键是更新受控、有批次、可审计，而不是零散随意改。" }, { q: "集成性具体要统一哪些内容？", a: "往口径和主数据上答：编码值（性别、状态码）、命名规范、单位与币种、时间口径、业务实体的 OneID 或主数据；可以举“各业务系统性别的取值不同”说明不统一时集成层要做的映射工作。" }], tags: ["四大特征", "主题", "集成", "历史"]
+    },
+    {
+      id: "BAS-004", category: "数仓基础概念", question: "Inmon 和 Kimball 两种数仓建设思想怎么选？", frequency: 5,
+      answer: `①Inmon 自顶向下，先建企业级三范式 EDW，再向数据集市供数，集成一致性强但周期长。②Kimball 自底向上，以业务过程构建维度模型，通过一致性维度形成总线，交付快且分析友好。③实践常混合使用：企业公共层重治理与复用，应用层采用星型和宽表提升消费效率。`,
+      detail: `Inmon 强调先形成稳定的企业数据模型，适合复杂组织和长期治理；Kimball 从订单、支付等可交付业务过程切入，通过总线矩阵逐步扩展。选择依据不是公司规模单一维度，而是交付时限、治理成熟度、跨域一致性要求和团队建模能力。`,
+      followUp: [{ q: "什么是 Kimball 总线矩阵？", a: "定义：以业务过程为行、一致性维度为列的矩阵，交叉点表示该过程使用哪些维度；作用是把多个数据集市纳入统一维度总线，指导渐进式集成建设，可与总线矩阵那道题（MOD-006）互相印证。" }, { q: "为什么国内常见分层架构是混合思想？", a: "从交付压力与治理折中答：纯 Inmon 周期太长、难以快速支撑业务，纯 Kimball 多集市容易口径分裂；国内分层架构用 ODS/DWD 保集成与复用（Inmon 的影子），用 DWS/ADS 面向主题和场景快速交付（Kimball 的影子）。" }], tags: ["Inmon", "Kimball", "EDW", "维度建模"]
+    },
+    {
+      id: "BAS-005", category: "数仓基础概念", question: "数据仓库、数据湖和湖仓一体分别解决什么问题？", frequency: 5,
+      answer: `①数仓存放治理后的结构化数据，模型与口径清晰，适合稳定 BI 分析。②数据湖以低成本保存结构化、半结构化及非结构化原始数据，灵活但易形成数据沼泽。③湖仓一体在对象存储上引入表格式、事务、Schema 演进和治理能力，兼顾湖的开放低成本与仓的可靠分析。`,
+      detail: `数据湖的关键是开放存储与计算分离；湖仓一体常借助 Iceberg、Hudi、Delta Lake 等表格式维护元数据、快照和 ACID。湖仓并不等于取消建模，原始数据仍需质量校验、维度一致性和指标治理。选型要考虑生态兼容、更新能力、并发与成本。`,
+      followUp: [{ q: "湖仓一体中的 ACID 如何实现？", a: "落到表格式机制：元数据清单加快照记录“哪些数据文件属于哪个版本”，写入先落地新数据文件，再原子切换元数据指针完成提交；可提 MVCC 乐观并发控制，以及 Iceberg 的 catalog 提交、Delta 的事务日志 _delta_log。" }, { q: "有了数据湖还需要数仓分层吗？", a: "需要。分层是治理逻辑而非存储技术：原始数据入湖不等于可分析，仍需明细、汇总、应用层的口径沉淀；湖仓只是让这些分层表获得 ACID、Schema 演进和时间旅行能力，可以用“数据沼泽”做反面论证。" }], tags: ["数据湖", "湖仓一体", "Iceberg", "表格式"]
+    },
+    {
+      id: "BAS-006", category: "数仓基础概念", question: "ETL 和 ELT 的区别是什么？各适合什么场景？", frequency: 4,
+      answer: `①ETL 先在计算引擎清洗转换，再把结果写入目标库，适合目标算力有限、入仓治理严格的传统数仓。②ELT 先加载原始数据，再利用云仓或湖仓算力转换，保留原貌、迭代灵活。③选择取决于目标平台算力、合规边界、数据量与重放需求，企业中常组合使用。`,
+      detail: `ETL 能在入仓前阻断敏感或脏数据，但原始细节可能丢失；ELT 便于按新口径重算，却要求目标平台具备资源隔离和治理能力。现代实践通常是采集阶段做必要的格式、脱敏和合法性处理，进入 ODS 后再完成可重放的分层转换。`,
+      followUp: [{ q: "ELT 会不会把脏数据带进数仓？", a: "承认会，这是 ELT 的结构性代价；关键是把校验清洗变成仓内分层的第一道工序而非入口闸：采集侧做格式、合法值、脱敏等轻校验，ODS 设隔离区并挂质量规则监控，“先落地”不等于“直接用”。" }, { q: "流式任务属于 ETL 还是 ELT？", a: "没有绝对归属，看转换发生在哪：在流引擎内完成清洗、关联、聚合再写入，偏 ETL；先入 Kafka 或湖、再按批或视图转换，偏 ELT；实际链路多为采集轻处理加仓内重转换的混合形态。" }], tags: ["ETL", "ELT", "数据集成"]
+    },
+    {
+      id: "BAS-007", category: "数仓基础概念", question: "什么是数据粒度？为什么建模时必须先声明粒度？", frequency: 5,
+      answer: `①粒度是一行数据所代表业务事实的最细层级，如“一条订单明细”或“用户每日快照”。②粒度决定主键、维度外键和可用度量，是事实表设计的契约。③同表混入不同粒度会造成重复关联和指标放大；建模时应先用一句话声明粒度，再选择事实与维度。`,
+      detail: `例如订单头是一单一行，订单明细是一单一商品一行。若把订单金额放到明细粒度且重复多行，再按商品聚合就会放大。确需同时分析时，应拆表、将头金额合理分摊，或仅保留可加的明细金额，并在模型文档中明确唯一键。`,
+      followUp: [{ q: "如何发现一张表混入了多个粒度？", a: "给可操作的检查法：先声明预期唯一键，按它分组计数，出现重复行即混入多粒度；再观察金额类指标在关联后是否放大、同一业务单号的多行含义是否不同（单头与明细混存）。" }, { q: "粒度越细越好吗？", a: "不是。粒度越细灵活性、可回溯性越强，但存储、扫描成本和查询复杂度也越高；原则是保留最细的业务有意义粒度，向上逐层汇总收敛，应用层只需要月报时不必把秒级明细透传到底。" }], tags: ["粒度", "主键", "事实表"]
+    },
+    {
+      id: "BAS-008", category: "数仓基础概念", question: "企业级数仓中，主题域和数据域有什么作用？", frequency: 4,
+      answer: `①数据域按相对稳定的业务边界划分数据，如交易、商品、用户、履约，用于确定模型归属和团队责任。②主题是面向某类分析对象或问题的数据集合，可跨多个业务系统。③合理划域能减少重复建设并明确依赖，但边界应以业务过程和数据责任为准，避免按组织架构机械切割。`,
+      detail: `“交易域”可包含下单、支付、退款等过程，“用户主题”可能整合注册、行为、会员与交易。组织架构会调整，业务过程更稳定，因此数据域不宜完全跟随部门。划域后还要定义主数据、公共维度与跨域事实的归属规则。`,
+      followUp: [{ q: "数据域和业务系统是一一对应的吗？", a: "不是。一个数据域常跨多个源系统（交易域包含订单、支付、退款系统），一个系统也可能给多个域供数；划域依据是相对稳定的业务过程和数据责任，而不是系统边界或组织架构。" }, { q: "跨域指标由谁负责？", a: "落到治理机制：为跨域指标指定唯一 Owner（通常是公共层或指标平台团队）统一定义口径，各域提供权威输入；配套指标评审与指标字典登记，避免“各部门各自算、口径各一套”。" }], tags: ["数据域", "主题域", "业务过程"]
+    },
+
+    {
+      id: "LAY-001", category: "数仓分层架构", question: "为什么数据仓库要分层？分层的收益和代价是什么？", frequency: 5,
+      answer: `①分层把采集、清洗、建模、汇总和应用解耦，使数据血缘清晰、口径复用、故障隔离且便于回刷。②公共中间层可减少烟囱式重复计算，底层变化也不会直接冲击报表。③代价是链路变长、存储与调度成本增加，并可能产生冗余；应按复用价值控制层数。`,
+      detail: `分层本质是用受控冗余换可维护性。每层要有明确输入输出契约，禁止随意跨层引用，否则只是物理上多了表。小团队也不必机械复制大厂六层，可保留 ODS、明细公共层和应用层，随业务复杂度演进。`,
+      followUp: [{ q: "层数越多越规范吗？", a: "恰恰相反。规范看职责清晰和契约执行，不看层数；只做字段透传、没有复用者的中间层纯属多余的存储与调度，按团队规模和复用价值裁剪层数才是成熟做法。" }, { q: "什么情况下允许跨层访问？", a: "原则禁止、例外可控：维表直查、应急修复、一次性取数可以例外，但要登记、限期、走视图或快照隔离，事后收敛回标准链路；警惕“例外变惯例”导致分层形同虚设。" }], tags: ["分层", "复用", "解耦", "血缘"]
+    },
+    {
+      id: "LAY-002", category: "数仓分层架构", question: "ODS 层的职责和建设要点是什么？", frequency: 5,
+      answer: `①ODS 贴源保存业务库、日志等原始数据，承担落地、格式统一和可追溯重放。②尽量保留源字段与原始粒度，仅做类型规范、非法值隔离、采集元数据补充等轻处理。③设计全量或增量分区，记录来源、抽取时间和批次，并对行数、主键、延迟及断点做校验。`,
+      detail: `ODS 常按源系统和表组织，增量表需保留操作类型、源端更新时间或日志位点。对敏感字段可在合规要求下入湖前脱敏。ODS 不是永久垃圾场，应设置生命周期；但生命周期内要能支撑下游按任意合法口径重放。`,
+      followUp: [{ q: "ODS 是否可以直接给报表使用？", a: "不建议。ODS 保留源系统语义：原始状态码、物理删除标记、未清洗脏值，报表直接使用会把源端变化与脏数据传导给消费方；临时核对、数据探查可以，正式报表必须走 DWD 及以上。" }, { q: "ODS 全量表和增量表如何命名与分区？", a: "给常见约定即可：全量快照表 ods_域名_对象_df 按 dt 每日分区存全量，增量表 _di 按日存变更流水；重点强调企业内部后缀含义必须唯一登记，并配来源库表、批次、抽取时间等采集元数据字段。" }], tags: ["ODS", "贴源", "增量", "重放"]
+    },
+    {
+      id: "LAY-003", category: "数仓分层架构", question: "DWD 层为什么被称为明细数据层？怎么建设？", frequency: 5,
+      answer: `①DWD 以业务过程为中心沉淀最细粒度、清洗规范后的事实数据，是指标计算的公共明细底座。②完成去重、脏值处理、编码统一、业务主键确定和必要维度退化，但一般不做跨粒度汇总。③表需明确粒度、唯一键、分区、事实类型，并保证同一过程只有一个权威来源。`,
+      detail: `订单明细、支付成功、退款明细都是典型 DWD 事实。DWD 不等于把 ODS 改个表名：它要把源系统状态转换成稳定业务事件，并处理撤销、删除、迟到等语义。维度代理键关联可在此层完成，也可在消费时关联，取决于技术架构。`,
+      followUp: [{ q: "DWD 可以做宽表吗？", a: "可以但限定范围：DWD 允许同粒度内的维度退化，把高频维度属性冗余进事实表减少关联；不允许跨粒度拼接或预汇总。判断标准是一句话：每行仍代表该业务过程的一个原子事件。" }, { q: "订单状态表如何转换成业务事件事实？", a: "核心是把状态流转解析成业务事件：基于状态字段与时间戳的变化日志生成“下单、支付、发货、完成”事件行，或用拉链/快照差分提取变化；注意处理状态回跳、撤销，并保证事件生成的幂等。" }], tags: ["DWD", "明细事实", "业务过程"]
+    },
+    {
+      id: "LAY-004", category: "数仓分层架构", question: "DWS 和 DWT 有什么区别？现在还需要单独建设 DWT 吗？", frequency: 5,
+      answer: `①DWS 面向主题或分析实体，对 DWD 按公共维度做轻度汇总，如用户日、商品日粒度，沉淀可复用派生指标。②DWT 常指面向实体的全周期累积宽表，汇总首次、最近、累计等状态。③DWT 并非必需层；若更新成本高、口径易混，可用主题宽表、快照表或指标服务替代。`,
+      detail: `不同公司对 DWS、DWT 命名并不完全一致，面试应先说明本公司定义。DWT 的价值是高频实体画像读取快，问题是每天重算或更新大量历史、不同时间窗混杂。现代湖仓支持 Merge 后可降低维护成本，但仍要明确快照日期和指标时效。`,
+      followUp: [{ q: "DWS 汇总到什么程度合适？", a: "以复用为尺：只沉淀被多个消费方共享的维度组合与派生指标（如用户日、商品日粒度），且保留可追溯回 DWD 的路径；报表专属口径不下沉，否则 DWS 会膨胀成第二个 ADS。" }, { q: "DWT 的累计值如何增量更新？", a: "两类思路：T+1 场景用“昨日存量合并今日增量”——首次类取 min、累计类相加、最近类按时间覆盖；实时场景用主键 Merge 更新；无论哪种，时间窗口径都要在表和字段注释里显式标注。" }], tags: ["DWS", "DWT", "主题汇总", "宽表"]
+    },
+    {
+      id: "LAY-005", category: "数仓分层架构", question: "ADS 层的定位是什么？为什么不应把业务逻辑都堆在 ADS？", frequency: 4,
+      answer: `①ADS 面向具体报表、接口、算法特征等应用场景，按消费方需要组织结果，强调查询性能和交付时效。②它可做最后的口径组合、排序与格式适配，但核心公共指标应来自统一模型。③若业务逻辑全堆在 ADS，会形成重复 SQL、口径漂移和难以回溯的烟囱，应及时下沉公共逻辑。`,
+      detail: `ADS 表通常生命周期与应用绑定，可采用宽表、结果表或服务化视图。判断逻辑是否下沉的标准是：是否被多个应用复用、是否属于统一业务定义、是否需要统一治理。一次性展示字段不必过度公共化。`,
+      followUp: [{ q: "ADS 与数据集市是什么关系？", a: "概念层级不同：数据集市是面向部门或主题的数据组织范畴，ADS 是分层架构中应用层的具体实现；实践里 ADS 常作为集市的技术载体，但集市更强调数据边界与所有权，而不只是一组结果表。" }, { q: "哪些逻辑应该从 ADS 下沉？", a: "三条判断标准：被两个以上应用复用、属于统一业务定义（如 GMV 口径）、需要集中治理（涉及考核或财务）；纯展示加工如排序、格式适配、图表组装留在 ADS 不下沉。" }], tags: ["ADS", "应用层", "数据集市"]
+    },
+    {
+      id: "LAY-006", category: "数仓分层架构", question: "DIM 层怎么建设？公共维度为什么重要？", frequency: 5,
+      answer: `①DIM 保存描述业务实体的属性与层级，如用户、商品、地区、门店，为事实提供分析视角。②建设时统一自然键、代理键、编码、层级和历史变化策略，明确快照或拉链口径。③公共一致性维度被多个事实共享，能保证跨主题钻取和指标可比；应由明确的数据责任方维护。`,
+      detail: `DIM 可以包含全量快照、拉链维度和小型码表。高基数、频繁变化属性可拆出微型维度或单独表。维度关联失败时要有未知成员，例如代理键 0，避免 inner join 丢失事实，同时监控未知键比例。`,
+      followUp: [{ q: "维度表为什么要使用代理键？", a: "两个核心理由：隔离源系统自然键的变化与多源键冲突，支撑 SCD2 下同一自然键对应多个历史版本；顺带提整型代理键关联性能和存储更优。自然键保留为普通字段用于溯源对账。" }, { q: "维度关联不到时如何处理？", a: "标准做法是在维度表预留未知成员（代理键 0 或 -1），事实外键关联失败时兜底指向它，避免 inner join 丢事实；同时监控未知键占比并回溯补维——它是数据质量问题的信号，不该被视为常态。" }], tags: ["DIM", "公共维度", "代理键"]
+    },
+    {
+      id: "LAY-007", category: "数仓分层架构", question: "数仓表和字段命名规范应该包含哪些信息？", frequency: 4,
+      answer: `①表名应稳定表达层级、数据域、业务过程、粒度或周期及装载方式，如 dwd_trade_order_detail_inc。②字段统一小写下划线，时间、金额、数量、状态使用一致后缀和单位。③禁止无意义缩写与同名异义，并配套中文名、口径、主键、分区、负责人和生命周期元数据。`,
+      detail: `常见表后缀有 _full、_inc、_di、_df，但企业内部含义必须唯一。例如 dt 一律表示业务日期且格式固定，*_amt 明确以分还是元保存。规范价值在于让人和工具都能识别，而非追求表名越长越好。`,
+      followUp: [{ q: "表名太长如何平衡？", a: "按信息优先级取舍：层级、数据域、业务过程不可省，粒度与周期用约定后缀表达，允许登记在册的标准缩写、禁止随性缩写；可读性靠中文名和元数据补齐，而不是把所有信息塞进表名。" }, { q: "技术元数据之外还要维护什么？", a: "补业务元数据与管理元数据：中文名、业务口径、负责人、数据安全分级、质量规则、生命周期；技术元数据让任务跑得起来，业务与管理元数据让表被正确使用并可追责。" }], tags: ["命名规范", "元数据", "数据标准"]
+    },
+    {
+      id: "LAY-008", category: "数仓分层架构", question: "全量表、增量表和快照表在分层中如何选择分区？", frequency: 4,
+      answer: `①全量快照通常按快照日 dt 分区，每个分区保存截至当日完整状态，读取简单但存储大。②增量表按事件发生日或采集日分区，仅存新增变更，节省空间但还原状态复杂。③选择要结合源端能力、变更频率和查询方式，并同时保留业务时间与处理时间，处理迟到和重跑。`,
+      detail: `小维表适合每日全量快照；大表优先日志增量或拉链。事件分区利于业务查询，采集分区利于任务幂等与追踪，二者冲突时可在 ODS 按采集日落地、DWD 按业务日重分区，并维护迟到数据修正机制。`,
+      followUp: [{ q: "业务时间和处理时间有什么区别？", a: "业务时间是事件真实发生的时刻，处理时间是数据被系统采集入库的时刻；迟到数据会让两者错位，所以分区口径、去重逻辑都要先声明按哪个时间；实时语境下对应 event time 与 processing time。" }, { q: "分区字段选错会带来什么问题？", a: "两类后果：查询侧无法分区裁剪、全量扫描推高时延和成本；写入侧重跑补数困难，迟到数据无处安放甚至覆盖正确分区。可以举“按采集日分区的表做业务日对账极其痛苦”的例子。" }], tags: ["分区", "全量", "增量", "快照"]
+    },
+    {
+      id: "LAY-009", category: "数仓分层架构", question: "如何判断数仓出现了过度分层或跨层依赖问题？", frequency: 4,
+      answer: `①中间层只做字段透传、没有复用者，却增加一次存储和调度，通常属于过度分层。②ADS 直接读 ODS、DWS 反向依赖 ADS、同层环形依赖，会破坏职责边界。③治理时应基于血缘统计复用率和链路时长，合并低价值节点，将共享逻辑下沉，并通过开发规范限制非法依赖。`,
+      detail: `不能只凭表名判断，需结合字段级血缘和任务使用情况。重构时先识别真正的权威输出与消费者，提供兼容视图或双跑校验，再逐步切流；直接删除透传表可能仍会破坏下游 SLA。`,
+      followUp: [{ q: "允许 ADS 直读 DWD 吗？", a: "看场景：探索性分析、低频内部报表可以接受，属于受控例外；高 SLA、对外口径的报表必须经公共汇总层，否则口径漂移和重复逻辑会让你回到烟囱时代，且 DWD 的变更会直接冲击报表。" }, { q: "如何安全合并两个中间层任务？", a: "步骤化回答：先基于血缘确认全部消费者，新旧任务双跑对账（行数、主键、金额、分布），消费者灰度切流，保留回滚窗口后再下线旧任务；强调只合并“透传”，有独立语义的加工不能简单并掉。" }], tags: ["过度分层", "跨层依赖", "血缘"]
+    },
+
+    {
+      id: "MOD-001", category: "建模方法", question: "请解释 1NF、2NF、3NF，以及它们在数仓中的意义。", frequency: 5,
+      answer: `①1NF 要求字段原子化，不在一列存重复组；2NF 在 1NF 上消除非主属性对联合主键的部分依赖；3NF 再消除非主属性对主键的传递依赖。②范式能减少冗余和更新异常，适合企业集成层。③分析层常有控制地反范式，以冗余换取少关联和高查询性能。`,
+      detail: `订单明细主键为订单号加商品号，若用户姓名只依赖订单号，就违反 2NF；若门店城市由门店号决定而表中同时保存，则可能存在传递依赖。范式不是目标本身，OLAP 设计要在一致性、维护成本和查询性能间权衡。`,
+      followUp: [{ q: "反范式会带来哪些数据质量风险？", a: "三类异常切入：更新异常（同一信息存多处、漏改即不一致）、插入异常、删除异常；翻译到数仓语境：冗余字段回刷成本高、口径多处定义易漂移；缓解靠单一权威来源加统一调度，而不是靠人记着同步改。" }, { q: "BCNF 与 3NF 有何差异？", a: "一句话：3NF 允许主属性依赖于候选键，BCNF 要求所有非平凡依赖的决定因素都必须是候选键；面试用经典的“学生-课程-教师”例子说明存在满足 3NF 但不满足 BCNF 的情形即可。" }], tags: ["1NF", "2NF", "3NF", "范式"]
+    },
+    {
+      id: "MOD-002", category: "建模方法", question: "Kimball 维度建模四步走是什么？", frequency: 5,
+      answer: `①选择业务过程，如下单、支付或发货，边界必须可观测。②声明粒度，用一句话定义事实表一行代表什么。③识别描述该过程的维度，即从谁、何时、何地、何种渠道等角度分析。④识别可度量事实并判断可加性。顺序不能颠倒，尤其要先定粒度再选事实。`,
+      detail: `以订单明细为例：过程是下单；粒度是一条订单商品明细；维度有日期、买家、商品、店铺、渠道；事实有件数、原价金额、优惠金额、实付金额。之后再决定事实表类型、代理键、迟到处理与分区。`,
+      followUp: [{ q: "为什么选择业务过程不是选择业务部门？", a: "部门会调整、过程更稳定；同一业务过程（如支付）常被多个部门共同分析，按部门建模会把数据割裂成烟囱；业务过程是客观可观测的事件流，天然承载粒度与事实，这是总线思想的基础。" }, { q: "粒度声明应该写到什么程度？", a: "标准是用一句话说清“一行代表什么”，并能由此推出唯一键，例如“一个订单中一个商品的一次购买明细”；检验方法是反问三个边界——时间、对象、事件是否都被钉死，含糊就说明粒度没声明到位。" }], tags: ["维度建模", "四步走", "业务过程", "粒度"]
+    },
+    {
+      id: "MOD-003", category: "建模方法", question: "星型、雪花和星座模型分别有什么特点？", frequency: 5,
+      answer: `①星型以事实表为中心直接连接反范式维度，关联少、查询简单，是分析层首选。②雪花把维度层级规范化拆分，冗余低但关联多、使用复杂。③星座由多个事实表共享一致性维度，适合企业多业务过程。④选择应优先可理解和性能，只有维度巨大或维护收益明确时再雪花化。`,
+      detail: `订单事实和支付事实共同连接日期、用户、渠道维度就是星座。商品维度若再拆品牌、类目表则形成雪花。星座不是星型的反面，而是多个星型通过一致性维度组合成企业总线。实际查询前仍应把不同事实分别聚合到共同粒度，避免直接明细互连造成金额放大。`,
+      followUp: [{ q: "星型模型为什么比雪花模型查询快？", a: "关联次数与优化器复杂度：星型事实直连单层反范式维度，取层级属性零跳或少跳；雪花要多跳 join 才能拿到规范化的层级，执行计划和优化难度都更高；且雪花节省的存储在列存和廉价存储时代收益有限。" }, { q: "星座模型如何处理不同事实粒度？", a: "原则是先各自聚合到共同粒度再合并展示（如都汇总到“日×渠道”），禁止明细级直接互连导致金额放大；多事实共享的是一致性维度而非数据行，这就是 drill-across 的标准姿势。" }], tags: ["星型模型", "雪花模型", "星座模型"]
+    },
+    {
+      id: "MOD-004", category: "建模方法", question: "宽表设计的优缺点是什么？什么时候适合做宽表？", frequency: 5,
+      answer: `①宽表预先整合事实、维度或多个指标，减少运行时关联，查询简单且适合固定高频场景。②缺点是字段冗余、更新代价高、粒度容易混乱、口径重复且血缘复杂。③适合稳定的用户画像、固定报表和查询加速，不应替代公共明细模型；必须明确主粒度、刷新策略和字段来源。`,
+      detail: `宽表可以是某一粒度内的反范式，例如“用户日”聚合多类行为；最危险的是把一对多明细直接横向连接导致笛卡尔放大。建设前应评估消费者数量、查询收益、存储更新成本，并保持公共事实作为可追溯来源。`,
+      followUp: [{ q: "用户宽表字段越来越多如何治理？", a: "分而治之：按主题拆分子宽表或标签层，字段设 Owner 与生命周期，定期依据使用率下线低价值字段；新字段上线前评审“是否公共口径、是否有人复用”，防止宽表退化成字段垃圾场。" }, { q: "如何避免宽表 Join 后指标放大？", a: "根因都是一对多关联的扇出：关联前先确认两侧键的基数（join 前后行数对比），多的一侧先聚合到目标粒度再关联；金额类指标只在原子粒度上计算，宽表之间的互相拼接要格外警惕。" }], tags: ["宽表", "反范式", "粒度"]
+    },
+    {
+      id: "MOD-005", category: "建模方法", question: "Data Vault 模型是什么？它适合替代维度模型吗？", frequency: 3,
+      answer: `①Data Vault 由 Hub、Link、Satellite 组成：Hub 保存稳定业务键，Link 保存业务键关系，Satellite 保存带时间的描述属性。②它强调可追溯、可扩展和并行装载，适合多源变化快的企业集成层。③模型表多、查询复杂，通常不直接服务 BI，而是在其上再产出星型模型或应用宽表。`,
+      detail: `Raw Vault 尽量忠实保存来源，Business Vault 加入业务规则。哈希键常用于分布式并行装载，但要处理规范化与碰撞策略。Data Vault 的优势在历史审计和源系统变化适配，代价是学习、存储和编排复杂度。`,
+      followUp: [{ q: "Hub 的业务键和代理键有什么区别？", a: "业务键来自源系统、有业务含义（如订单号），代理键是仓内生成的无含义标识；Data Vault 常用哈希键充当代理键，便于跨源统一和并行装载，业务键则始终是血缘追踪与对账的锚点。" }, { q: "Data Vault 为什么适合并行加载？", a: "结构解耦：Hub、Link、Satellite 只追加不更新，彼此之间没有装载顺序的强依赖；键值由哈希独立计算、不需要集中发号器，天然适配分布式并行写入，这是它面向企业集成层的设计初衷。" }], tags: ["Data Vault", "Hub", "Link", "Satellite"]
+    },
+    {
+      id: "MOD-006", category: "建模方法", question: "什么是总线矩阵？如何用它规划数仓模型？", frequency: 4,
+      answer: `①总线矩阵以业务过程为行、一致性维度为列，交叉点表示某过程使用哪些维度。②先盘点下单、支付、履约等过程及日期、用户、商品等公共维度，再确定建设优先级和责任边界。③它能发现维度复用与缺口，指导多个星型模型渐进集成，避免各数据集市独立定义口径。`,
+      detail: `矩阵不是简单的表清单，而是企业分析能力地图。每个业务过程对应一种明确粒度的事实表；维度列要定义一致的键、层级和属性语义。业务扩展时可新增行列，而不必推翻已有模型。`,
+      followUp: [{ q: "总线矩阵和数据域划分有什么关系？", a: "互补关系：数据域解决数据归属与责任边界（偏治理），总线矩阵是业务过程乘一致性维度的分析能力地图（偏建模）；矩阵里的公共维度列往往就是跨域共享的一致性维度，两者可互相校验缺口。" }, { q: "同名维度但口径不同怎么办？", a: "先显式承认冲突再治理：梳理各自语义，能统一就建一致性维度并迁移全部消费者；确实两种口径都合理（如财务口径与业务口径收入），就改名区分、各自登记，杜绝同名异义共用一个字段名。" }], tags: ["总线矩阵", "一致性维度", "Kimball"]
+    },
+    {
+      id: "MOD-007", category: "建模方法", question: "如何从业务需求中识别事实、维度和指标？", frequency: 4,
+      answer: `①先把需求还原为可度量业务过程和最细事件，动词通常提示事实，如购买、支付；名词和分析角度提示维度，如用户、商品。②事实是事件在既定粒度上的数值或计数，指标则是在事实之上的限定、聚合和计算。③必须回到源系统验证事件边界、唯一键、状态流和可加性。`,
+      detail: `“查看华东新客近七日支付金额”中，支付是业务过程，支付明细是事实，地区和用户类型是维度，金额是原子度量，华东、新客、近七日是统计限定。不能直接按报表列名建表，否则相似需求会重复建设。`,
+      followUp: [{ q: "状态字段是事实还是维度？", a: "看用法而非名字：状态用来过滤、分组、描述“某时点是什么”时，是维度属性或快照/拉链的内容；状态的“变化次数、持续时长”等可度量数值才是事实；实践中订单状态常退化为事实表字段或进拉链维。" }, { q: "比率应该存入事实表吗？", a: "不直接存：比率不可加，直接聚合会出错；正确做法是存分子、分母两个可加度量，查询时再相除；可以结合事实可加性（FAC-006）一起回答，显得体系化。" }], tags: ["事实", "维度", "指标", "需求分析"]
+    },
+    {
+      id: "MOD-008", category: "建模方法", question: "模型设计评审时，你会重点检查哪些内容？", frequency: 4,
+      answer: `①业务层检查过程边界、粒度、口径、负责人和使用场景。②数据层检查主键、维度一致性、事实可加性、历史策略、迟到删除及空值处理。③工程层检查分区、文件布局、更新方式、依赖、SLA、成本和安全分级。④最后用典型 SQL 验证不会重复关联且能支撑钻取。`,
+      detail: `评审需要业务、数据开发和消费方共同参与，结论沉淀到模型元数据。可用样例数据走查“一行代表什么”，用基数和关联测试验证唯一性。模型上线后还应观察使用率、查询成本和质量规则，不是一审定终身。`,
+      followUp: [{ q: "如何验证事实表主键并不真正唯一？", a: "数据探查加业务复核：按声明的主键分组计数，抽样并全量检查重复；重复出现说明“一行代表什么”被业务现实推翻（拆单、合并单、补发）；结论是把唯一性写成质量规则常态监控，而不是评审时查一次。" }, { q: "模型评审谁应该有最终决定权？", a: "没有单一裁判：业务方定口径、数据负责人定模型与工程可行性、消费方确认可用性，重大争议升级到数据委员会或架构组；关键是评审结论要沉淀成元数据与契约，而不是谁级别高谁拍板。" }], tags: ["模型评审", "粒度", "SLA", "数据质量"]
+    },
+    {
+      id: "MOD-009", category: "建模方法", question: "范式建模和维度建模如何在企业数仓中共存？", frequency: 4,
+      answer: `①范式模型按实体关系组织，冗余低、变更一致，适合整合复杂源系统和沉淀企业实体。②维度模型按业务过程组织，结构直观、聚合高效，适合分析消费。③可在贴源之后用范式或 Data Vault 做整合，再产出维度模型；也可直接在公共明细层采用维度模型，取决于复杂度和交付目标。`,
+      detail: `不存在必须先三范式再维度的固定路径。若源系统少、业务过程清晰，直接 Kimball 更敏捷；若多源主数据复杂、监管追溯强，企业集成模型更有价值。关键是层间契约清楚，同一事实和实体有权威定义。`,
+      followUp: [{ q: "直接做维度模型会丢失哪些能力？", a: "丢失多源实体的深度整合与审计追溯能力：没有企业集成层时，跨系统主数据冲突、历史归因、源系统变更适配都要在维度模型里硬扛；业务简单、源系统少时这些代价可以接受，这就是权衡。" }, { q: "如何避免两套模型口径不一致？", a: "单一权威来源加单向派生：维度模型统一从集成层或公共明细派生，禁止两边各自接源；关键指标在指标字典里登记唯一口径，上线前用双跑对账验证两套模型产出一致。" }], tags: ["范式建模", "维度建模", "企业模型"]
+    },
+
+    {
+      id: "FAC-001", category: "事实表设计", question: "事务事实表、周期快照事实表和累积快照事实表有什么区别？", frequency: 5,
+      answer: `①事务事实表一行一个不可再分事件，按发生追加，粒度最细，如支付明细。②周期快照按固定周期记录实体状态，如账户日余额，适合趋势分析。③累积快照一行跟踪流程实例，在里程碑发生时更新各时间点，如订单履约。三者分别回答发生了什么、某时点怎样、流程走到哪。`,
+      detail: `事务事实通常数据量最大且易增量；周期快照即使没有变化也可生成一行，便于期末状态统计；累积快照适合步骤有限且可预测的流程，会发生更新。一个业务可同时建设三类表，它们粒度和用途不同，不能混用金额后直接相加。`,
+      followUp: [{ q: "订单表一定是累积快照吗？", a: "不一定，取决于分析目标：看流程耗时与当前阶段用累积快照，看事件流水用事务事实，看每日末状态用周期快照；实践中三张表常共存，粒度不同、各司其职，别指望一张表回答所有问题。" }, { q: "周期快照中的余额是否可加？", a: "半可加：同一时点跨账户、跨门店可以加，跨时间相加没有业务意义；汇总到周或月应取期末值或平均值，回答时点出“先确认业务上如何解释这个时间维度”会显得有实战感。" }], tags: ["事务事实", "周期快照", "累积快照"]
+    },
+    {
+      id: "FAC-002", category: "事实表设计", question: "事务事实表怎么设计？需要保存业务状态吗？", frequency: 5,
+      answer: `①先定义原子业务事件和最细粒度，使用源事件唯一键保证幂等，保存发生时间、关联维度键和可加度量。②事务事实以追加为主，记录事件发生时的上下文，而不是反复覆盖当前状态。③状态流应拆成事件或另建快照；若保留状态字段，必须说明它是事件当时状态而非最新状态。`,
+      detail: `支付成功和退款成功应作为不同业务事件，不能只在订单行上修改状态，否则难以还原过程。源系统只有当前状态表时，可通过 CDC 识别状态迁移，但需过滤无关更新、处理乱序，并定义哪些迁移构成有效事件。`,
+      followUp: [{ q: "同一事件重复到达如何保证幂等？", a: "核心是靠源事件唯一键：写入侧按 event_id 判重（主键冲突拒绝或 Merge 覆盖），或读取侧去重；再补一句端到端严格一次很难，工程主流是“至少一次投递加幂等消费”。" }, { q: "事件撤销应删除原事实还是写冲正？", a: "优先冲正：写一条反向或更正事件，保留完整审计轨迹，下游可直接重放；物理删除只用于合规（如被遗忘权）或初始化错误，因为删除会破坏血缘、让重算无法还原现场。" }], tags: ["事务事实表", "事件", "幂等"]
+    },
+    {
+      id: "FAC-003", category: "事实表设计", question: "周期快照事实表适合哪些场景？设计时注意什么？", frequency: 4,
+      answer: `①周期快照在日、周、月等固定时点记录实体状态，适合库存、余额、会员等级和在途订单趋势。②粒度需同时包含实体与快照周期，明确期初、期末或日内某时点语义。③状态型度量通常对实体可加、对时间不可加，跨日应取期末值或平均值，不能直接求和。`,
+      detail: `例如商品门店日库存，一行为“某商品在某门店某日闭店时库存”。即使当天无变更，也可能需要继承昨日状态形成连续快照。构建方式可从当日变更加昨日存量滚动，也可从当前全量直接快照，前者要重点防止历史错误累积。`,
+      followUp: [{ q: "没有变化的实体要不要生成快照？", a: "看消费方式做权衡：连续快照（无变化也继承昨日生成一行）查询最简单、BI 直接扫；只记变化点省存储，但把“最近非空值补齐”的复杂度转嫁给查询侧；给结论时说明你们团队选了哪种及原因。" }, { q: "如何补某一天缺失的库存快照？", a: "两条路径：变更流水可信时，取前一日存量加当日变更滚动补齐；否则从源端重拉当日数据或从后续状态反推重建；补数后必须与相邻日对账，防止错误沿存量向后累积。" }], tags: ["周期快照", "库存", "半可加事实"]
+    },
+    {
+      id: "FAC-004", category: "事实表设计", question: "累积快照事实表如何处理订单履约这类长流程？", frequency: 5,
+      answer: `①以流程实例为粒度，一行保存创建、支付、发货、签收等可预测里程碑时间及当前状态。②新流程插入，后续节点到达后按业务键更新同一行，并可计算阶段耗时。③要处理节点跳过、回退、乱序和长期未完成；若流程分支高度动态，应改用事务事件表还原，而非强塞固定列。`,
+      detail: `累积快照提供低成本流程时长分析，但更新写入对 Hive 不友好，可按日重建活跃流程分区、使用支持 Merge 的 Hudi/Iceberg，或由事件表定期生成。保留原始里程碑事件是修复累积快照的基础。`,
+      followUp: [{ q: "Hive 上如何实现累积快照更新？", a: "Hive 不擅长行级更新：常见做法是“当日全量重建活跃流程分区”（未完结实例每日重算）或写临时表后原子替换；要真正行级更新就上 Hudi/Iceberg 的 Merge；无论如何要保留原始里程碑事件，作为重放修复的基础。" }, { q: "流程发生退款回退怎么记录？", a: "两种思路：主里程碑列保持单调，回退用独立列记录（当前阶段、回退次数、最近回退时间）；分支复杂时改用事件事实表记录每次流转，累积快照只维护主流程，回退细节交给事件表。" }], tags: ["累积快照", "履约", "里程碑"]
+    },
+    {
+      id: "FAC-005", category: "事实表设计", question: "什么是无事实的事实表？举两个业务例子。", frequency: 4,
+      answer: `①无事实事实表没有数值度量，只记录多个维度组合对应的事件或覆盖关系，行数本身就是可计数事实。②事件型例子是用户参加活动，可统计参与人数；覆盖型例子是促销计划覆盖哪些商品和门店，可与实际销售对比未发生情况。③仍必须声明粒度、唯一键和关联维度。`,
+      detail: `覆盖事实表能表达“应该发生但没有发生”的集合。例如先得到促销覆盖商品门店，再左连接销售事实，销售为空即可发现未售出对象。若只查销售表，无法区分“不在计划内”和“计划内但未销售”。`,
+      followUp: [{ q: "无事实事实表和普通关系表有什么区别？", a: "差别在建模意图：无事实事实表是分析模型的一等公民，有声明粒度、挂一致性维度、承载“行即事件或覆盖”的语义；普通关系表只是实体间外键的集合，不一定面向分析、也缺少维度上下文。" }, { q: "如何统计没有参加培训的员工？", a: "用覆盖思维：员工全集（维度）左连接培训参与事实表，连接结果为空的即为未参加；强调“只在参与表里查永远得不到零发生集合”，这正是覆盖型事实表不可替代的地方。" }], tags: ["无事实事实表", "覆盖", "事件"]
+    },
+    {
+      id: "FAC-006", category: "事实表设计", question: "事实的可加性分哪几类？比率为什么不建议直接存？", frequency: 5,
+      answer: `①完全可加事实可沿所有维度求和，如销售金额。②半可加事实只沿部分维度可加，如日余额可按账户加、不可跨时间直接加。③不可加事实如单价、比率，只能按业务规则重算。④比率应尽量保存分子分母，汇总后相除，直接平均比率会因样本权重不同产生错误。`,
+      detail: `库存量对商品、门店可加，但跨天相加没有业务意义。客单价应保存支付金额和买家数，在目标粒度重新计算。极值、去重人数也不是简单可加度量，通常需要明细、预聚合可合并结构或限定粒度的指标表。`,
+      followUp: [{ q: "UV 属于哪种可加性？", a: "不可加：去重计数跨天、跨维度不能直接相加（同一用户多天活跃会被重复计）；工程上要么保留明细现场重算，要么用 HLL、Bitmap 这类可合并的预聚合结构，并说明误差可接受。" }, { q: "平均客单价如何从日汇总到月？", a: "不能对每日客单价再取平均——天数与订单权重不同会算错；正确做法是月维度上保存支付金额总额和买家数（或订单数），汇总后相除，也就是“存分子分母、用时再除”。" }], tags: ["可加事实", "半可加", "比率"]
+    },
+    {
+      id: "FAC-007", category: "事实表设计", question: "迟到事实和迟到维度怎么处理？", frequency: 4,
+      answer: `①迟到事实按业务发生时间回补目标分区，同时记录处理时间并触发受影响汇总重算。②事实先到、维度未到时，可关联未知代理键，待维度到达后回填；或创建占位维度再补属性。③处理必须幂等并设置迟到窗口、补数 SLA 与监控，超窗口数据走专项修复而非静默丢弃。`,
+      detail: `流式场景用 Watermark 只决定何时关闭窗口，不代表超时数据可以不治理。离线场景可每日扫描最近 N 天更新。维度采用 SCD2 时，事实应按事件发生时刻匹配有效版本，而不是永远关联当前版本。`,
+      followUp: [{ q: "未知代理键用 null 还是固定值？", a: "用固定值（0 或 -1）并在维度表放对应的“未知成员”行：null 会让 inner join 直接丢行，也不便于统计监控；固定键可以量化未知比例，维度数据到达后还能按规则批量回填。" }, { q: "回补历史分区会影响哪些下游？", a: "沿血缘全链路评估：依赖该分区的 DWS、ADS、指标与报表都要重算；存量滚动型表（快照、DWT）还要重算回补日之后的所有分区；所以先出影响清单、按拓扑序回刷，而不是只补一个分区。" }], tags: ["迟到事实", "迟到维度", "回补"]
+    },
+    {
+      id: "FAC-008", category: "事实表设计", question: "事实表设计有哪些通用原则？", frequency: 5,
+      answer: `①围绕可观测业务过程建模，一表一粒度并写清唯一键。②优先保存原子事实和可加度量，不混入不同粒度汇总或易变描述。③维度键、业务时间、处理时间、来源和审计字段齐全。④明确增删改、幂等、迟到、冲正和历史策略，并用唯一性、完整性及对账规则持续验证。`,
+      detail: `事实表应尽量保留最低可用粒度，让上层能灵活汇总，但要权衡隐私和成本。度量命名包含单位与税前税后等口径。多事实关联前先各自聚合到共同粒度，避免一对多乘法放大。上线前还要用真实边界样本验证撤销、重复和跨日事件，确保模型语义可稳定重放。`,
+      followUp: [{ q: "事实表是否应该包含文本字段？", a: "限制在退化标识（订单号、票据号）与短枚举码；大段描述、地址、长备注应归维度表或单独存储；判断标准是“是否高频用于分组钻取”，长文本进事实表会显著拖垮扫描与压缩效率。" }, { q: "多个业务过程可以放在一张事实表吗？", a: "同粒度、同维度集合、事件强相关的可以合并；但默认优先一个过程一张表，通过一致性维度组合使用；混放容易让粒度声明变含糊、不同过程的口径互相污染，评审时很难过。" }], tags: ["事实表原则", "原子事实", "唯一键"]
+    },
+
+    {
+      id: "DIM-001", category: "维度表设计", question: "设计一张维度表通常有哪些步骤？", frequency: 5,
+      answer: `①确定业务实体、使用场景和维度粒度，识别稳定自然键。②整合多源属性，统一编码、层级、枚举、空值与主数据归属。③生成代理键，选择 SCD 历史策略并定义未知成员。④设计层次、分组和高频描述字段，确定分区、装载及质量规则，最后与相关事实验证关联基数。`,
+      detail: `维度设计强调可理解性。先列出业务术语和分析路径，再决定属性是否拆分。自然键用于识别同一实体，代理键用于隔离源系统变化并支持 SCD2。上线前检查自然键重复、层级闭合、事实孤儿键与历史有效期。`,
+      followUp: [{ q: "所有维度都需要代理键吗？", a: "不是。码表、日期维度可以用有意义的自然键（日期本身就是键）；需要 SCD2 多版本、多源整合或要隔离自然键变化的维度，代理键的收益才大于成本；这是选型而非默认动作。" }, { q: "自然键发生变化怎么办？", a: "先分纠错还是业务变更：源端录错了走受控修复（修正自然键并记录新旧映射）；若是业务上真会变，说明它不配做自然键，应换稳定标识，旧键留在别名表里——事实表因用代理键而不受影响。" }], tags: ["维度设计", "自然键", "代理键"]
+    },
+    {
+      id: "DIM-002", category: "维度表设计", question: "SCD Type 0 和 Type 1 分别怎么处理属性变化？", frequency: 4,
+      answer: `①Type 0 固定保留首次值，后续变化不覆盖，适合出生日期、首次注册渠道等理论上不应改变或需保留原始归因的属性。②Type 1 直接覆盖旧值，不保存历史，适合错别字修正、非历史分析属性。③实现可按自然键 Merge 更新，但要区分业务变化和数据纠错，避免误丢历史。`,
+      detail: `Type 0 并不是忽略所有源端更新，应对确属错误的数据走受控修复。Type 1 更新后，历史事实关联该维度也会看到新属性，因此只适用于“不需要按当时属性分析”的字段。同一维度的不同属性可以采用不同 SCD 策略。`,
+      followUp: [{ q: "Type 1 更新会怎样影响历史报表？", a: "历史报表会“漂移”：旧事实关联到的是更新后的属性，按当时口径的分析被悄悄改写；所以 Type 1 只用于不需要历史归因的字段，涉及考核、财务口径的属性绝不能图省事用 Type 1。" }, { q: "首次渠道属于事实还是 Type 0 属性？", a: "两种形态都成立：作为注册事件事实的维度键记录当时渠道，或作为用户维度的 Type 0 属性；要点是一旦确定永不覆盖，并与“最近渠道”（Type 1）明确命名区分，避免两个口径混用。" }], tags: ["SCD0", "SCD1", "缓慢变化维"]
+    },
+    {
+      id: "DIM-003", category: "维度表设计", question: "SCD Type 2 的原理是什么？事实表如何关联正确版本？", frequency: 5,
+      answer: `①Type 2 对属性变更新增一条维度记录，旧记录关闭有效期，从而完整保留历史。②每个版本使用不同代理键，并维护生效时间、失效时间和当前标识，同一自然键有效区间不得重叠。③事实应按业务发生时间命中有效区间并写入对应代理键，才能按事件当时属性分析。`,
+      detail: `常用半开区间 [start_time, end_time)，当前版本 end_time 取 9999-12-31。事实关联条件为 natural_key 相等且 event_time >= start_time 且 event_time < end_time。若事实只关联 current_flag=1，历史事实会随当前属性漂移。`,
+      followUp: [{ q: "为什么推荐左闭右开区间？", a: "闭闭区间要求结束值减一个单位，日期和时间戳粒度不同就会产生边界歧义或重叠；左闭右开 [start, end) 让 end 直接等于下一版本的 start，比较、关联和闭链写法都简洁且无洞。" }, { q: "事实迟到且维度已变更时如何关联？", a: "按事件的业务时间匹配有效区间，而不是关联当前版本——这正是 SCD2 存在的意义；前提是维度历史完整，若历史已丢失，只能从事后快照或 CDC 日志重建区间再回填代理键。" }], tags: ["SCD2", "代理键", "有效期"]
+    },
+    {
+      id: "DIM-004", category: "维度表设计", question: "SCD Type 3 怎么实现？和 Type 2 如何选择？", frequency: 4,
+      answer: `①Type 3 在同一行增加当前值、前一值或固定几个历史列，更新时把当前值移到旧值列，仅保留有限历史。②它查询简单、行数不增长，适合只比较调整前后且变化次数有限的属性。③Type 2 能保留完整变更轨迹，更通用但数据量和关联复杂度更高；选择由历史深度与查询需求决定。`,
+      detail: `例如组织架构只要求“现部门与上次部门”对比，可用 current_dept、previous_dept、change_date。若需要按任意历史时点还原，Type 3 无法满足，应使用 Type 2。实际项目中 Type 3 较少，不能把多个历史值无限加列。`,
+      followUp: [{ q: "Type 3 能记录多次变更吗？", a: "只能保留固定深度的最近几次：加几列记几次，更早的变更会被挤掉；所以它适合“只和上一次比”的场景，任意历史时点还原必须上 Type 2，别试图无限加列。" }, { q: "同一维度能混用 Type 1 和 Type 2 吗？", a: "可以且很常见：按属性分别选策略（姓名纠错走 Type 1，等级变化走 Type 2）；实现细节是关键——Type 2 触发新版本时，要带上 Type 1 字段的最新值，否则新版行里这些字段是旧的。" }], tags: ["SCD3", "缓慢变化维", "历史版本"]
+    },
+    {
+      id: "DIM-005", category: "维度表设计", question: "什么是拉链表？它和每日全量快照、SCD2 有什么关系？", frequency: 5,
+      answer: `①拉链表用开始日期、结束日期把实体每次状态的有效区间串联起来，只在状态变化时新增版本，当前记录以远期结束日表示。②它本质上是 SCD Type 2 的常见物理实现，能按任意日期还原历史。③相比每日全量快照更省存储，但增量合并、区间维护和历史修复更复杂。`,
+      detail: `例如用户等级 7 月 1 日为普通、7 月 10 日变为会员，则普通版本有效至 7 月 10 日之前，会员版本从 7 月 10 日开始。推荐使用左闭右开区间，避免日期减一天在时间戳场景产生边界歧义。快照是每周期复制状态，拉链只记录变化点。`,
+      followUp: [{ q: "拉链表为什么叫拉链？", a: "形象解释即可：每个实体的历史版本像拉链的链牙，按时间首尾相接、依次咬合；拉合是完整历史，拉开任意一节就是某时点状态；答出“区间串联、按需展开”这个意象就到位了。" }, { q: "什么场景不适合做拉链？", a: "三类：变化率极高的实体（每天都变，拉链退化成全量且维护更贵）、无历史分析需求（直接 Type 1 或当前表）、源端拿不到可靠变化点；另外以当前状态高并发点查为主的场景，当前表加索引比拉链更合适。" }], tags: ["拉链表", "SCD2", "历史快照"]
+    },
+    {
+      id: "DIM-006", category: "维度表设计", question: "请写出从首日全量数据初始化拉链表的 Hive SQL。", frequency: 5,
+      answer: `①首日源数据去重后，每个自然键生成一个当前版本，start_dt 取业务快照日，end_dt 统一设为 9999-12-31，is_current 设为 1。②同时生成稳定代理键或哈希键，并保存批次字段。③写入前校验自然键唯一、开始日非空，确保初始化后每个实体恰好一个当前版本。`,
+      detail: "表以用户等级为例，首日直接把全量快照转成当前版本。生产中 surrogate_key 更建议由统一序列或键映射服务生成。\n```sql\nCREATE TABLE dim_user_zip (\n  user_sk BIGINT, user_id BIGINT, user_level STRING, city STRING,\n  start_dt STRING, end_dt STRING, is_current TINYINT, etl_time TIMESTAMP\n) STORED AS ORC;\n\nINSERT OVERWRITE TABLE dim_user_zip\nSELECT row_number() OVER(ORDER BY user_id) AS user_sk,\n       user_id, user_level, city, '${bizdate}' AS start_dt,\n       '9999-12-31' AS end_dt, 1 AS is_current, current_timestamp()\nFROM (SELECT *, row_number() OVER(PARTITION BY user_id ORDER BY update_time DESC) rn\n      FROM ods_user_full WHERE dt='${bizdate}') s\nWHERE rn=1;\n```",
+      followUp: [{ q: "row_number 生成代理键有什么隐患？", a: "不稳定是致命伤：重跑或源数据顺序变化后，同一用户可能分到不同键，引用它的事实外键全部错位；生产应用统一发号服务、键映射表，或带碰撞处理的稳定哈希，row_number 只适合一次性初始化演示。" }, { q: "首日全量存在重复用户时怎么处理？", a: "先去重再初始化：按自然键取 update_time 最新一条（题中 rn=1 的逻辑）；但要追问重复根因——源端脏数据还是同步链路重复，并把“自然键唯一”写成质量规则告警，而不是静默随机选一条。" }], tags: ["拉链初始化", "Hive SQL", "代理键"]
+    },
+    {
+      id: "DIM-007", category: "维度表设计", question: "请写拉链表每日增量合并的核心 SQL，并说明闭链逻辑。", frequency: 5,
+      answer: `①先对当日增量按自然键取最后一条，并与当前版本比较业务属性哈希，过滤无变化更新。②对发生变化的旧当前记录，把 end_dt 关闭为新版本 start_dt、is_current 置 0。③再插入新版本，未变化及非当前历史原样保留；任务按业务日幂等覆盖目标表或使用支持 Merge 的表格式。`,
+      detail: "下面采用左闭右开区间，end_dt 等于新版本 start_dt；changed CTE 只保留真正变化的键。为便于面试展示使用 INSERT OVERWRITE，生产需写临时表后原子替换。\n```sql\nWITH inc AS (\n  SELECT user_id,user_level,city\n  FROM (SELECT *,row_number() OVER(PARTITION BY user_id ORDER BY update_time DESC) rn\n        FROM ods_user_inc WHERE dt='${bizdate}') t WHERE rn=1\n), changed AS (\n  SELECT i.* FROM inc i LEFT JOIN dim_user_zip d\n    ON i.user_id=d.user_id AND d.is_current=1\n  WHERE d.user_id IS NULL OR nvl(i.user_level,'')<>nvl(d.user_level,'')\n        OR nvl(i.city,'')<>nvl(d.city,'')\n), merged AS (\n  SELECT d.user_sk,d.user_id,d.user_level,d.city,d.start_dt,\n         CASE WHEN d.is_current=1 AND c.user_id IS NOT NULL THEN '${bizdate}' ELSE d.end_dt END end_dt,\n         CASE WHEN d.is_current=1 AND c.user_id IS NOT NULL THEN 0 ELSE d.is_current END is_current\n  FROM dim_user_zip d LEFT JOIN changed c ON d.user_id=c.user_id\n  UNION ALL\n  SELECT CAST(xxhash64(concat_ws('|',cast(user_id AS string),'${bizdate}')) AS BIGINT),\n         user_id,user_level,city,'${bizdate}','9999-12-31',1 FROM changed\n)\nINSERT OVERWRITE TABLE dim_user_zip\nSELECT *,current_timestamp() FROM merged;\n```",
+      followUp: [{ q: "源端物理删除如何进入拉链？", a: "删除是一种特殊变化：有 CDC 的 delete 事件就生成一个删除标记版本或按业务语义闭链；源端硬删且无日志时只能靠全量比对差集发现，代价大且有延迟——这正是上游优先逻辑删除的原因。" }, { q: "任务同一天重跑为什么必须幂等？", a: "重跑会重复执行“闭链加开链”，产生重复版本或错误区间；幂等手段：按业务日整体覆盖目标表（如题中 INSERT OVERWRITE）、先写临时表再原子替换，或按 (natural_key, start_dt) 判重。" }], tags: ["拉链合并", "闭链", "增量 SQL"]
+    },
+    {
+      id: "DIM-008", category: "维度表设计", question: "拉链表出现断链、重叠或错误版本，如何检测和修复？", frequency: 5,
+      answer: `①按自然键用 lag(end_dt) 检查相邻版本，要求前一 end_dt 等于后一 start_dt，且 start_dt 小于 end_dt、当前版本仅一个。②修复以可信 ODS 快照或 CDC 日志重建受影响实体的变化点，不能只手改一行。③在临时表完成重算，与事实关联数和属性哈希校验后原子替换，并回刷受影响下游。`,
+      detail: "先检测区间，再限定 user_id 重建，避免全表重刷。若业务允许状态间存在空窗，则断链规则需调整，但重叠始终不应出现。\n```sql\nWITH x AS (\n  SELECT user_id,start_dt,end_dt,is_current,\n         lag(end_dt) OVER(PARTITION BY user_id ORDER BY start_dt) prev_end,\n         sum(is_current) OVER(PARTITION BY user_id) current_cnt\n  FROM dim_user_zip\n)\nSELECT * FROM x\nWHERE start_dt>=end_dt OR (prev_end IS NOT NULL AND prev_end<>start_dt)\n   OR current_cnt<>1;\n```\n修复后还要重算在错误有效期内关联了旧代理键的事实或建立键映射。",
+      followUp: [{ q: "修复维度后事实代理键要不要重写？", a: "看影响面：错误有效期内关联了错误版本的事实，必须重算外键或建立键映射修正；先按区间评估受影响分区，重算后与旧数据双跑对账再切换，别全表盲目重写。" }, { q: "如何从 CDC 日志重建变化点？", a: "按主键排序日志，相邻行比较业务属性、过滤无关字段更新，属性真正变化的点即为区间边界；乱序按源端时间重排，日志断档处用全量快照校准，重建后跑断链检测验证。" }], tags: ["拉链修复", "区间重叠", "数据质量"]
+    },
+    {
+      id: "DIM-009", category: "维度表设计", question: "什么是退化维度？为什么订单号常放在事实表里？", frequency: 4,
+      answer: `①退化维度是直接保存在事实表中的业务标识，没有独立维度表及额外描述属性，如订单号、票据号。②它可用于明细钻取、分组和跨事件串联，单独建一张只有键的维表没有收益，反而增加关联。③若该标识后来出现大量描述属性或独立管理需求，应再提升为普通维度。`,
+      detail: `订单号在订单明细事实中会重复，但事实粒度仍是订单商品明细；它作为分析维度可统计订单数。退化维度不是把任意文本塞进事实表，大段描述、地址等应归入维度或专门明细存储。`,
+      followUp: [{ q: "退化维度需要代理键吗？", a: "不需要：它以业务标识形态直接存在事实表里，没有独立维度表就没有代理键的位置；将来它积累了描述属性、升级为独立维度时，再引入代理键并迁移事实外键。" }, { q: "订单状态属于退化维度吗？", a: "看形态：状态码作为事实表字段、没有独立维表时，可以按退化维度处理（或简单视为事实属性）；一旦状态需要名称、层级、流转规则等描述，就应建状态维表，频繁变化再考虑拉链。" }], tags: ["退化维度", "订单号", "事实表"]
+    },
+    {
+      id: "DIM-010", category: "维度表设计", question: "什么是一致性维度？跨主题事实如何实现一致钻取？", frequency: 5,
+      answer: `①一致性维度是在不同事实和数据集市间共享业务含义、键、属性、层级及历史策略的公共维度。②各事实使用同一代理键，或使用可无损映射、同粒度的子集维度，才能按用户、商品等统一切片。③治理上需统一主数据来源、变更发布和版本契约，禁止各域私自重定义同名属性。`,
+      detail: `订单事实与售后事实都关联同一商品维度，才能比较类目销售与退款。若某事实只需要商品大类，可使用一致性维度的缩减子集，但大类编码和层级必须兼容。Role-playing Dimension 如下单日期、支付日期共享同一日期维度。`,
+      followUp: [{ q: "角色扮演维度是什么？", a: "同一维度在一张事实表中被引用多次、扮演不同角色：下单日期、支付日期、发货日期共享同一日期维度，SQL 里用别名或视图区分角色；数据只存一份，语义按角色解释，日期维是最典型的例子。" }, { q: "两个源系统用户 ID 不一致如何做一致维度？", a: "建实体解析层：通过手机号、设备、实名信息等做 OneID 映射，生成统一代理键，各源 ID 作为自然键别名保留；映射规则要可解释、可回溯，配置信度分级与人工仲裁流程。" }], tags: ["一致性维度", "跨主题", "主数据"]
+    },
+    {
+      id: "DIM-011", category: "维度表设计", question: "什么是微型维度？它解决什么问题？", frequency: 3,
+      answer: `①微型维度把大维表中频繁变化、相互关联的一组低基数属性拆出，按属性组合生成小维度及代理键。②事实记录当时组合键，可避免主维度因这些属性高频变化产生大量 SCD2 版本。③适合用户画像分群等场景，但组合数过多会爆炸，且连续数值应先合理分桶。`,
+      detail: `例如年龄段、收入段、活跃等级、风险等级组成用户画像微型维度。用户主维仍保存稳定身份属性，事实或桥接表保存 profile_sk。微型维度的分桶边界属于业务口径，需要版本化，不能随意改变导致历史不可比。`,
+      followUp: [{ q: "微型维度和普通拆表有什么区别？", a: "目的不同：微型维度把“属性组合”本身维度化，事实记组合键，主维度不再因这些属性高频变化而产生海量 SCD2 版本；普通拆表只是物理分表加主键关联，主维的版本照样增长。" }, { q: "属性组合爆炸如何控制？", a: "低基数加合理分桶是前提：连续值先离散化（年龄段、收入段），控制纳入属性的个数——组合数是各属性基数的乘积，且分桶边界要版本化；组合数到十万级以上就该放弃微型维度方案。" }], tags: ["微型维度", "SCD2", "画像分群"]
+    },
+    {
+      id: "DIM-012", category: "维度表设计", question: "维度表应该整合还是拆分？判断标准是什么？", frequency: 4,
+      answer: `①同一业务实体、同一粒度且经常共同分析的属性应优先整合，形成单一权威维度，减少重复关联。②安全等级不同、变化频率差异大、一对多属性、超大文本或独立生命周期内容可拆分。③拆分后必须保留稳定键和一对一或一对多契约，避免按源系统机械拆成多个互相冲突的用户维度。`,
+      detail: `用户基本属性和会员属性若都是一人一行且常用，可整合；用户多个收货地址是一对多，应独立建地址维度或桥接。手机号等敏感属性可放受权限控制的扩展表。最终依据查询模式、更新成本、权限和基数，而非表宽的固定阈值。`,
+      followUp: [{ q: "一对多维度属性如何建模？", a: "三条路径：独立成子维度加桥接表（多收货地址）、主维只保留“主/默认”那一个、或多值属性 JSON 化做补充存储；让分析最高频的那条路径最简单，其余的接受多一步关联。" }, { q: "敏感字段拆表后如何保证一致性？", a: "同一批次产出、共享代理键与版本号：拆表只是物理和权限上的隔离，逻辑上仍是同一维度；对账规则要覆盖两表行数与键一致性，防止出现一边更新、另一边没更新的裂口。" }], tags: ["维度整合", "维度拆分", "一对多"]
+    },
+
+    {
+      id: "SYN-001", category: "数据同步", question: "全量、增量和 CDC 同步有什么区别？如何选择？", frequency: 5,
+      answer: `①全量每次读取完整数据，实现简单、易校准，适合小表和初始化，但耗资源且时效低。②增量依赖更新时间或递增键抽取变化，成本低但可能漏删除、同秒更新。③CDC 解析数据库日志捕获增删改，低侵入、时效高且语义完整，但需管理位点、Schema 与乱序。选型看规模、时效和源端能力。`,
+      detail: `常见路径是先做一致性快照，再从对应日志位点持续 CDC，避免快照与增量之间出现缺口。若用 update_time，必须设计回看窗口并按主键幂等去重。无主键表和 DDL 变更是 CDC 的高风险点。`,
+      followUp: [{ q: "全量切增量如何保证无缝衔接？", a: "关键是快照与增量绑定同一位点：做一致性快照时记录 binlog/LSN 位置，从该位点起接 CDC，衔接重叠段按主键幂等去重；最忌“快照跑完随手挑个时间开增量”，中间就是一段谁都看不见的数据缺口。" }, { q: "基于 update_time 为什么可能丢数据？", a: "三类漏洞要能数出来：同精度时间内多批更新只抽到一部分、长事务提交时间晚于 update_time 落入的窗口、物理删除根本没有 update_time 可抓；缓解靠回看窗口加主键幂等，根治还是得换 CDC。" }], tags: ["全量", "增量", "CDC"]
+    },
+    {
+      id: "SYN-002", category: "数据同步", question: "DataX 的架构和工作原理是什么？", frequency: 4,
+      answer: `①DataX 是离线批量同步框架，Reader 与 Writer 插件解耦异构数据源，中间通过内存 Channel 传输标准 Record。②Job 切分成多个 Task，由 TaskGroup 并发执行，可按速度或并发限流。③它适合 T+1 全量、条件增量迁移，不原生解析数据库日志；一致性依赖切分策略、幂等写入和任务后校验。`,
+      detail: `Reader 负责切分和读取，Channel 提供流控，Writer 批量提交。关系库切分列应分布均匀且有索引，否则并行读可能倾斜或压垮源库。DataX 失败重试不等于端到端 Exactly-Once，目标表通常采用临时表加分区替换或主键覆盖。`,
+      followUp: [{ q: "DataX 如何提高同步速度？", a: "并发与限流两条线：切分列选分布均匀且有索引的字段，提高 Task 并发、调整 channel 限速和 batchSize；同时盯源库压力与带宽，写入端用批量提交，必要时先关索引再重建。" }, { q: "DataX 任务重跑如何避免重复？", a: "明确 DataX 不保证端到端 Exactly-Once，幂等要写在 Sink 侧：按业务主键覆盖或 Upsert、写临时表（临时分区）跑完原子替换、或先按条件清理目标分区再写；失败重试不等于无重复。" }], tags: ["DataX", "Reader", "Writer", "离线同步"]
+    },
+    {
+      id: "SYN-003", category: "数据同步", question: "Sqoop 的导入原理是什么？它和 DataX 有何差异？", frequency: 3,
+      answer: `①Sqoop 通过 MapReduce 并行从关系库导入 HDFS/Hive，按 split-by 列计算范围，每个 Mapper 执行一段 SQL，也支持直接模式。②适合 Hadoop 生态批量搬迁，但启动重、生态老化且连接类型有限。③DataX 采用插件加线程 Channel，数据源更丰富、部署更轻；二者都不是日志 CDC，均需控制源库压力和幂等。`,
+      detail: `split-by 应选择数值型、分布较均匀且有索引的列。边界查询得到 min/max 后划区间，数据倾斜会让某个 Mapper 成为长尾。Sqoop 增量的 append 或 lastmodified 仍依赖业务字段，无法天然捕获物理删除。`,
+      followUp: [{ q: "split-by 列选择不当有什么后果？", a: "典型后果是长尾：某个 Mapper 分到的区间数据量远超其他，整个任务被它拖住；无索引列还会引发源库全表扫描压力；类型选错（如字符串列）区间切分可能不均甚至漏数据。" }, { q: "Sqoop 如何同步删除记录？", a: "直接回答是做不到：append 和 lastmodified 只能抓新增与更新；替代方案是源端改逻辑删除（deleted 标记当作更新同步）、定期全量比对差集找删除，或者干脆换 CDC 方案。" }], tags: ["Sqoop", "MapReduce", "split-by"]
+    },
+    {
+      id: "SYN-004", category: "数据同步", question: "Canal 和 Maxwell 的原理是什么？二者怎么比较？", frequency: 4,
+      answer: `①二者都伪装 MySQL 从库，完成协议握手后读取 binlog，并把 row 模式变更解析为结构化事件。②Canal 生态和部署能力较丰富，可由客户端订阅；Maxwell 更轻量，常直接输出 JSON 到 Kafka。③它们主要负责捕获与投递，端到端一致性仍要靠 binlog 位点、Kafka 事务或幂等下游实现。`,
+      detail: `必须开启 row 格式并配置唯一 server_id、日志保留和权限。DDL、无主键更新、大事务、binlog 被清理都会影响恢复。Canal/Maxwell 通常只捕获增量，初始全量需另行完成并记录匹配位点。`,
+      followUp: [{ q: "为什么 CDC 推荐 row 格式 binlog？", a: "row 格式记录每一行变更的前后镜像，才能精确还原增删改；statement 只记 SQL 原文，now()、uuid() 这类非确定函数会主从不一致；且只有 row 模式解析端才能拿到变更前的数据做拉链和对账。" }, { q: "binlog 位点丢失后如何恢复？", a: "分两种情况：binlog 还在，就按 GTID 或时间戳重新定位续传；日志已被 purge，只能回到“一致性快照加新位点”的流程重做衔接；无论哪条，恢复后都要对账验证窗口内不重不漏。" }], tags: ["Canal", "Maxwell", "binlog"]
+    },
+    {
+      id: "SYN-005", category: "数据同步", question: "Flink CDC 如何实现全量加增量一体化？", frequency: 5,
+      answer: `①Flink CDC 基于 Debezium 读取数据库快照和变更日志，先把表按主键切分为快照块并记录低高水位，再无缝切到日志阶段。②增量快照可并行、无需长时间全局锁，并支持动态加表。③借助 Flink Checkpoint 保存分片进度和日志位点，结合幂等或两阶段提交 Sink 实现端到端一致性。`,
+      detail: `快照期间到达的 binlog 变更会在区间内校正快照结果，避免快照和增量断层。主键分布、数据库日志保留期和大表扫描压力都要评估。Exactly-Once 还取决于 Sink 是否支持事务或主键幂等，Source 一致不代表全链路一致。`,
+      followUp: [{ q: "Flink CDC 增量快照为何不需要长锁？", a: "核心在分片水位：表按主键切成快照块，每块只记录低、高两个 binlog 水位，块扫描期间并发到达的变更在水位区间内回放校正；锁从全库长锁降为分片级短锁甚至无锁，源库写入几乎不受影响。" }, { q: "目标是 ClickHouse 时如何保证幂等？", a: "ClickHouse 没有真正的主键约束：用 ReplacingMergeTree 按版本列（update_time 或位点）在合并时去重，查询侧用 FINAL 或 argMax 兜底未合并部分；本质是“引擎版本替换加查询合并”，要向面试官承认这不是强约束。" }], tags: ["Flink CDC", "Debezium", "增量快照"]
+    },
+    {
+      id: "SYN-006", category: "数据同步", question: "分库分表数据如何同步到数仓并还原全局语义？", frequency: 5,
+      answer: `①采集时保留源库、源表、分片键和日志位点，统一映射到同一逻辑表，并校验各分片 Schema。②业务主键若仅分片内唯一，要拼接租户或分片标识形成全局键；相同记录的路由迁移需识别为一次移动。③调度要覆盖分片新增、失败补偿与水位对齐，汇总前做全局去重和分片级对账。`,
+      detail: `不能只用自增 id 合并多个分片。分片扩容时一条数据可能在新旧表短暂双写，需利用业务全局 ID、更新时间和变更版本去重。CDC 任务应从配置中心发现分片，并将每个分片位点独立纳入 Checkpoint。`,
+      followUp: [{ q: "分片扩容双写期间如何去重？", a: "靠业务全局 ID 加版本折叠：同一记录在迁移期可能同时出现在新旧分片，按全局 ID 分组、按更新时间或日志位点取最新；路由迁移要识别为“移动”而非“新增”，对账按逻辑表做而不是按物理分片。" }, { q: "各分片进度不一致时何时对外出数？", a: "对齐水位再出数：取所有分片位点的最小值作为全局一致点，只发布该水位之前的数据；落后分片触发告警和补偿——绝不能用跑得最快的那个分片来定义数据新鲜度。" }], tags: ["分库分表", "全局主键", "分片"]
+    },
+    {
+      id: "SYN-007", category: "数据同步", question: "数据同步链路如何保证一致性和幂等？", frequency: 5,
+      answer: `①Source 记录可恢复位点，传输层至少一次投递，Sink 以业务主键加版本做 Upsert 或事务提交，重放结果不变。②全量与增量切换必须绑定同一快照位点，批任务采用临时分区写完后原子替换。③通过源目标行数、主键、金额及抽样哈希对账，并保留批次、位点和异常明细支持追溯补偿。`,
+      detail: `Exactly-Once 是端到端属性：源可重放、计算状态一致快照、Sink 原子提交缺一不可。无法事务提交时，常采用至少一次加幂等。对追加事件可用 event_id 去重；对状态表需比较 version 或 source_update_time 防止旧事件覆盖新状态。`,
+      followUp: [{ q: "至少一次加幂等是否等价于 Exactly-Once？", a: "结果等价、语义不同：最终数据不重不丢，但过程中确实存在重复处理，中间状态和外部副作用可能短暂可见；严格 Exactly-Once 要求状态快照与 Sink 提交原子绑定（如两阶段提交）；点出“结果一致对过程一致”是加分项。" }, { q: "如何防止乱序更新覆盖新值？", a: "版本化写入：每条记录携带 source_update_time 或单调版本（LSN），Sink 只在新版本更大时才覆盖，旧事件直接丢弃；无法比较版本的链路，要靠缓冲重排或按业务时间窗治理。" }], tags: ["一致性", "幂等", "Exactly-Once"]
+    },
+    {
+      id: "SYN-008", category: "数据同步", question: "同步中遇到删除、Schema 变更和断点恢复，分别怎么处理？", frequency: 4,
+      answer: `①删除需从 CDC 获取 delete 事件，下游选择物理删除、逻辑删除或关闭拉链，策略由消费语义决定。②Schema 变更先做兼容性检查：加可空列可平滑演进，改类型、重命名需双写和版本迁移。③断点从已确认位点恢复，位点与下游提交必须一致；日志过期则重新做快照并对账。`,
+      detail: `建议建立 Schema Registry 或变更审批，把 DDL 作为数据事件同步。消费端忽略 delete 会产生幽灵记录；只保留最新值又可能不满足审计。恢复后必须校验时间窗内是否重复或缺失，而不是只看任务运行成功。`,
+      followUp: [{ q: "源表无主键时 delete 事件如何处理？", a: "row 模式下删除靠整行镜像匹配，无主键时下游无法定位唯一行，可能误删多行；对策是给源表补主键或唯一索引、降级用全部列做匹配键，或对该表退回全量比对；记住“无主键表是 CDC 高危对象”。" }, { q: "字段类型从 int 改 string 如何无损迁移？", a: "走兼容演进而非原地改：新增 string 列并双写过渡，历史数据回填校验，下游全部切换后下线旧列；直接 ALTER 改类型在不同引擎行为不一（截断、失败或隐式转换），湖格式里的类型宽化也要按各自规则验证。" }], tags: ["Schema 演进", "删除同步", "断点续传"]
+    },
+
+    {
+      id: "DEV-001", category: "SQL 与数据开发", question: "Hive SQL 的逻辑执行顺序是什么？常见误区有哪些？", frequency: 5,
+      answer: `①逻辑顺序通常是 FROM/JOIN、WHERE、GROUP BY、聚合、HAVING、SELECT、DISTINCT、窗口函数、ORDER BY、LIMIT；具体以引擎优化后计划为准。②WHERE 不能直接引用同层 SELECT 别名，聚合后筛选用 HAVING。③窗口函数不改变行数，不能在同层 WHERE 过滤其结果，应包一层子查询。`,
+      detail: `SQL 是声明式语言，书写顺序不是逻辑执行顺序，优化器还会做谓词下推、列裁剪和 Join 重排。面试回答时需区分“语义上的逻辑顺序”和“物理执行计划”，后者通过 EXPLAIN 查看。`,
+      followUp: [{ q: "窗口函数和 GROUP BY 谁先执行？", a: "逻辑上 GROUP BY 先执行：窗口函数在 SELECT 阶段、基于分组聚合后的行集计算，所以窗口里可以引用聚合结果（如 sum(sum(x)) over()），反过来 WHERE 里永远用不了窗口函数——这也是为什么要套子查询过滤 rn=1。" }, { q: "LEFT JOIN 右表条件放 WHERE 有什么风险？", a: "会把未匹配行（右表字段为 null）过滤掉，语义退化成 INNER JOIN；正确做法是右表条件放 ON、WHERE 只放左表条件；顺手提 null 不参与等值比较，这个坑在 LEFT JOIN 里成双出现。" }], tags: ["Hive SQL", "执行顺序", "HAVING"]
+    },
+    {
+      id: "DEV-002", category: "SQL 与数据开发", question: "row_number、rank、dense_rank 有什么区别？lag 和 lead 呢？", frequency: 5,
+      answer: `①row_number 不管并列都给连续唯一序号，适合去重；rank 并列同名次且后续跳号；dense_rank 并列同名次但不跳号。②lag 取分区内前 N 行，lead 取后 N 行，均需明确 partition by 和 order by。③排序字段不唯一时结果可能不稳定，应追加确定性排序键。`,
+      detail: `分数 100、100、90 对应 row_number 为 1、2、3，rank 为 1、1、3，dense_rank 为 1、1、2。lag/lead 常用于环比、连续登录和状态变化检测。窗口 frame 会影响 sum、first_value 等函数，默认 frame 需谨慎。`,
+      followUp: [{ q: "取每组前 3 名含并列该用哪个函数？", a: "用 dense_rank：并列同名次且后续不跳号，外层过滤 rk<=3 就能保留所有并列第三；rank 会跳号（1,1,3 之后第三名消失），row_number 强行只留一行，都不满足“含并列”的口径。" }, { q: "窗口排序相同如何保证结果可重复？", a: "排序键不唯一时窗口内行序不确定，row_number 分配会在重跑间漂移；解法是追加确定性 tiebreaker（主键、事件 ID）作第二排序键；lag/lead 同理，否则环比结果可能每次都不一样。" }], tags: ["窗口函数", "row_number", "rank", "lag"]
+    },
+    {
+      id: "DEV-003", category: "SQL 与数据开发", question: "order by、sort by、distribute by、cluster by 有什么区别？", frequency: 5,
+      answer: `①order by 保证全局有序，传统 Hive 通常汇总到单个 Reducer，数据大时昂贵。②sort by 仅保证每个 Reducer 内有序。③distribute by 决定相同键进入同一 Reducer，常与 sort by 组合。④cluster by x 等价于 distribute by x 加 sort by x，只能同字段同升序，不能表达降序或不同排序键。`,
+      detail: `若要按 user_id 分桶并按 event_time 排序，可写 DISTRIBUTE BY user_id SORT BY user_id,event_time。ORDER BY 配 LIMIT 在部分引擎可优化为 TopN，但语义仍是全局排序。CLUSTER BY 与建表 CLUSTERED BY 的物理分桶概念不要混淆。`,
+      followUp: [{ q: "怎样实现每个分区内部排序？", a: "sort by 保证单个 reducer 内有序，配合 distribute by 把同一分桶键送进同一 reducer：DISTRIBUTE BY k SORT BY k, t；同字段同升序时可简写 cluster by k，降序或不同排序键就必须拆开写。" }, { q: "order by 一定只有一个 Reducer 吗？", a: "语义上要求全局有序，传统 Hive on MR 会归并到单个 reducer；但现代引擎可做范围分区加多路归并，order by 加 limit 还能优化成分布式 TopN；稳妥答法是“语义全局有序，物理实现看引擎和版本”。" }], tags: ["order by", "sort by", "distribute by", "cluster by"]
+    },
+    {
+      id: "DEV-004", category: "SQL 与数据开发", question: "MapJoin 的原理是什么？什么时候可能导致 OOM？", frequency: 5,
+      answer: `①MapJoin 把小表加载到各 Mapper 内存构建哈希表，流式扫描大表完成关联，避免大表 Shuffle 和 Reduce 阶段。②适合一大一小等值 Join，Hive 可按统计信息自动转换。③小表压缩后虽小，反序列化哈希结构可能膨胀；并发 Task 各持副本，估算不足会 OOM，应控制阈值或拆分热点。`,
+      detail: `广播表不仅看 HDFS 文件大小，还看行数、列宽、对象开销和容器内存。多张小表同时广播会叠加。现代引擎还可能采用 Grace Hash Join 等策略，排查时通过 EXPLAIN 和运行指标确认是否真正广播。`,
+      followUp: [{ q: "小表多大才算小？", a: "不看文件大小，看内存占用：行数乘列宽乘对象开销要小于容器可用内存，参数阈值只是线索；压缩文件解压后可能膨胀数倍，多张小表同时广播还要叠加，估算靠统计信息和 EXPLAIN 验证。" }, { q: "MapJoin 能解决热点键倾斜吗？", a: "能解决 Join 阶段的倾斜：大表不再按 key shuffle，热点键不再挤爆单个 reducer；但它解决不了后续 Group By 的热点，也以小表放得下内存为前提——两个边界条件都要主动交代。" }], tags: ["MapJoin", "广播 Join", "OOM"]
+    },
+    {
+      id: "DEV-005", category: "SQL 与数据开发", question: "Hive 小文件问题从哪里来？怎么治理？", frequency: 5,
+      answer: `①小文件常由上游并发过高、动态分区过多、频繁微批写入或 Reducer 数设置不当产生。②它会增加 NameNode 元数据、任务枚举与打开文件开销，降低扫描吞吐。③治理包括源头控制并行度和分区粒度、写入时合并、定期 Compaction、采用 ORC/Parquet 大文件，并设置文件数与均值监控。`,
+      detail: `理想文件大小取决于存储块、查询并发和引擎，一般追求数百 MB 级而非固定数字。实时入湖可先写小文件，再由 Hudi/Iceberg compaction 合并。仅执行 concatenate 或全表重写治标不治本。`,
+      followUp: [{ q: "小文件为什么影响 NameNode？", a: "每个文件、每个 block 都是 NameNode 堆里的一条元数据（约 150 字节），海量小文件直接吃 NameNode 内存、拖慢所有元数据操作；客户端列目录、打开文件的开销也随文件数线性增长。" }, { q: "Reducer 数和输出文件数是什么关系？", a: "每个 reducer（写出 task）至少产出一个文件，动态分区下是 reducer 数乘分区数；治理要从源头调并行度和分区粒度、写出时合并，事后 concatenate 只是治标。" }], tags: ["小文件", "Compaction", "NameNode"]
+    },
+    {
+      id: "DEV-006", category: "SQL 与数据开发", question: "数据倾斜有哪些典型原因？你如何定位？", frequency: 5,
+      answer: `①原因包括热点键或大量 null、Join 两侧基数不匹配、Group By 极端分布、可切分性差的大文件，以及分区或并行度设置不合理。②现象是少数 Task 输入、Shuffle 或耗时远高于中位数并形成长尾。③定位先看执行计划和 Stage 指标，再对键做频次 TopN、null 比例及采样，确认倾斜发生在哪个算子。`,
+      detail: `不要看到慢任务就直接判定倾斜，慢节点、GC、远程读和资源抢占也会长尾。应对比 Task 输入行数、Shuffle Read、Spill、GC 时间。定位到具体 Join 或聚合键后，才选择广播、加盐或两阶段聚合。`,
+      followUp: [{ q: "如何用 SQL 快速找出热点键？", a: "对关联或分组键做频次画像：group by 键取 count 的 TopN，同时算 null/空串占比和分位数；TopN 键占总行数的比例一摆出来，集中度立刻可见，比盲猜快得多。" }, { q: "Task 长尾一定是数据倾斜吗？", a: "不一定：慢节点、GC 停顿、远程冷读、资源抢占都会长尾；判别看输入分布——倾斜是少数 task 的输入行数或 Shuffle 显著高于中位数，环境问题是输入相近但耗时不均，别上来就加盐。" }], tags: ["数据倾斜", "热点键", "长尾"]
+    },
+    {
+      id: "DEV-007", category: "SQL 与数据开发", question: "大表 Join 出现热点键倾斜，有哪些解决方案？", frequency: 5,
+      answer: `①若一侧足够小优先广播，彻底避免按 Join key Shuffle。②可拆出 null 或已知热点单独处理；对热点键在大表随机加盐，小表复制所有盐值，关联后再还原。③也可先按键预聚合、使用引擎 skew join 优化或提升并行度。④方案必须保持 Join 语义，尤其注意小表复制带来的数据膨胀。`,
+      detail: `加盐适合热点键集合有限的场景。大表键变为 concat(key,'_',rand(N))，小表热点键展开 N 份；非热点不应复制。若两边都是超大明细且热点严重，可先在业务允许的粒度聚合，减少参与 Join 的行数。`,
+      followUp: [{ q: "加盐为什么要复制小表？", a: "大表的热点键被随机打上 N 种盐，小表必须把热点键展开成 key_1 到 key_N 共 N 份，才能保证每种盐都能匹配上；关联后再去盐还原；非热点键不复制，把小表膨胀控制在可接受范围。" }, { q: "LEFT JOIN 中 null 键应该怎样处理？", a: "大量 null 键彼此本来就不会匹配，却会被 hash 到同一个 reducer 挤爆它；做法是把 null 行单独拆出直接保留在结果、非 null 部分正常关联后 union 回来；给 null 随机盐也行，但要想清楚语义。" }], tags: ["Join 倾斜", "加盐", "热点拆分"]
+    },
+    {
+      id: "DEV-008", category: "SQL 与数据开发", question: "Group By 或 count distinct 数据倾斜怎么处理？", frequency: 5,
+      answer: `①普通聚合可先在 Map 端局部聚合，或给键加随机盐做第一阶段聚合，再按原键二次汇总。②单个超热点键无法靠增加 Reducer 拆开，必须加盐或独立计算。③count distinct 可先按“分组键+去重键”分桶去重，再按分组键计数；多个 distinct 可拆任务，避免同一 Stage 状态过大。`,
+      detail: `两阶段聚合要求聚合函数可合并，sum/count/min/max 容易，精确去重需要先去重再计数。超大基数且允许近似时可用 HyperLogLog，显著降低状态和 Shuffle，但要说明误差范围，不能偷偷替换精确口径。`,
+      followUp: [{ q: "为什么增加 Reducer 不能解决单个热点键？", a: "因为同一 key 按哈希永远进同一个 reducer，reducer 加得再多，那个超级热点键还是独享一台机器；要拆只能改变 key 本身（加盐）或换计算方式（两阶段聚合、预聚合、单独算热点）。" }, { q: "精确 UV 与近似 UV 如何选？", a: "看口径用途：考核、财务、对外报告必须精确（明细重算或 Bitmap 精确去重）；趋势监控、大盘看板可接受近似，HLL 能把状态和 Shuffle 降几个数量级——但要把误差率写进口径，不许偷换。" }], tags: ["聚合倾斜", "count distinct", "两阶段聚合"]
+    },
+    {
+      id: "DEV-009", category: "SQL 与数据开发", question: "Hive 中如何实现行列转换？", frequency: 4,
+      answer: `①行转列常用条件聚合：group by 主键后用 max/sum(case when 类型=值 then 指标 end) 生成列；类别动态时需先生成 SQL。②列转行可用 union all，或把多列封装成 array/map 后配合 explode、lateral view 展开。③转换前要明确目标粒度与重复值聚合规则，避免 max 随意吞掉多行。`,
+      detail: `条件聚合适合固定有限枚举；collect_set/concat_ws 可把多行值拼接到一列，但集合无序且会去重。列转行使用 stack 也很方便，例如 stack(3,'语文',chinese,'数学',math,'英语',english)。`,
+      followUp: [{ q: "动态列名如何实现？", a: "纯 SQL 无法动态生成 Schema，敢说这句话就是得分点；两条落地路径：先用元数据或类别表查出枚举值、由脚本拼接生成条件聚合 SQL；或输出 map/JSON 列交给应用层展开。" }, { q: "collect_list 和 collect_set 有什么区别？", a: "collect_list 保留全部元素含重复，collect_set 去重；两者都不保证顺序（需要有序得配合排序或 sort_array 后处理）；配 concat_ws 做拼接是典型组合，可各举一个使用场景。" }], tags: ["行转列", "列转行", "explode"]
+    },
+    {
+      id: "DEV-010", category: "SQL 与数据开发", question: "如何系统优化一条慢 Hive SQL？", frequency: 5,
+      answer: `①先用 EXPLAIN 和运行指标定位扫描、Join、Shuffle、聚合还是写出瓶颈，避免盲目调参。②通过分区裁剪、列裁剪、谓词下推、预聚合和合理 Join 顺序减少数据量。③再处理倾斜、小文件、广播与并行度，选择 ORC/Parquet、压缩和向量化。④最后校验结果一致并记录基线。`,
+      detail: `优化顺序应从数据量和算法入手，再考虑资源。检查是否因函数包裹分区列导致无法裁剪，是否先 Join 后过滤，是否发生一对多放大。统计信息缺失会导致 CBO 选错 Join 策略，应定期收集表与列统计。`,
+      followUp: [{ q: "谓词下推和分区裁剪有什么区别？", a: "层次不同：分区裁剪发生在元数据/规划层，按分区键条件整段跳过目录；谓词下推是把过滤条件尽量压到扫描和存储层提前执行（甚至下推到 Parquet/ORC 的 row group）；一个是 IO 规划，一个是执行优化。" }, { q: "CBO 依赖哪些统计信息？", a: "表级行数与大小、列级 NDV、min/max、null 比例和直方图；缺失或过期会让 CBO 选错 join 顺序和广播策略，所以要定期 analyze，大表重点维护 join 键列的统计。" }], tags: ["Hive 优化", "EXPLAIN", "谓词下推"]
+    },
+    {
+      id: "DEV-011", category: "SQL 与数据开发", question: "Hive SQL 中 null、count 和 Join 有哪些高频陷阱？", frequency: 5,
+      answer: `①null 不等于任何值，包括自身；判断用 is null，比较和拼接需显式 nvl/coalesce。②count(*) 统计行，count(col) 忽略 null，count distinct 也忽略 null。③LEFT JOIN 后在 WHERE 过滤右表字段会把未匹配行剔除，语义近似 INNER JOIN，右表条件通常应放 ON 中。④NOT IN 遇 null 可能全为未知，优先 NOT EXISTS。`,
+      detail: `聚合时 null 会形成一个分组，但多数聚合函数忽略 null。concat 任一参数为 null 可能返回 null，concat_ws 通常跳过 null，需按引擎验证。外连接过滤条件的位置会改变结果集，是 SQL 手撕常见扣分点。`,
+      followUp: [{ q: "count(1) 和 count(*) 有性能差异吗？", a: "语义和性能基本等价，主流引擎把 count(1) 优化成与 count(*) 相同的行计数；真正要区分的是 count(col)（忽略 null）和 count(distinct col)（触发去重，代价高且易倾斜）。" }, { q: "NOT IN 子查询含 null 为什么危险？", a: "三值逻辑陷阱：只要子查询结果含一个 null，x NOT IN (...) 对每行都求值为 UNKNOWN，整张结果集为空且极难排查；标准解法是改写 NOT EXISTS，或先在子查询里把 null 过滤掉。" }], tags: ["null", "count", "LEFT JOIN"]
+    },
+
+    {
+      id: "LAB-001", category: "高频 SQL 手撕题", question: "给定用户登录日志，求每个用户最长连续登录天数，并筛出连续至少 N 天的用户。", frequency: 5,
+      answer: `①先按用户和日期去重，避免一天多次登录影响连续性。②用 row_number 按用户排序，把登录日期减去序号；连续日期减序号后得到相同分组锚点。③按用户和锚点聚合得到每段起止日期及天数，再取每个用户最大值或用 HAVING 筛选不少于 N 天，复杂度清晰且无需自连接。`,
+      detail: "建表与 Hive/Spark SQL：\n```sql\nCREATE TABLE user_login(user_id BIGINT, login_time TIMESTAMP) STORED AS ORC;\n\nWITH d AS (\n  SELECT DISTINCT user_id,to_date(login_time) login_dt FROM user_login\n), n AS (\n  SELECT user_id,login_dt,row_number() OVER(PARTITION BY user_id ORDER BY login_dt) rn FROM d\n), g AS (\n  SELECT user_id,login_dt,date_sub(login_dt,cast(rn AS INT)) grp FROM n\n), seg AS (\n  SELECT user_id,min(login_dt) start_dt,max(login_dt) end_dt,count(*) days\n  FROM g GROUP BY user_id,grp\n)\nSELECT user_id,max(days) max_consecutive_days\nFROM seg GROUP BY user_id HAVING max(days)>=${N};\n```\n核心是“连续序列减等差序号后不变”。",
+      followUp: [{ q: "如果允许中间断一天仍算连续，怎么改？", a: "把分组锚点换成“断点计数”：按用户排序后累计 gap 超过允许天数的次数（sum(case when datediff>1 then 1 else 0 end) over），次数相同的行属于同一段；或先按原方法切段，再把间隔在容忍内的相邻段合并；先问清“允许断一次还是多处”。" }, { q: "如何输出每段连续区间？", a: "中间结果 seg 已经按“用户加锚点”聚合出 min(login_dt)、max(login_dt)，直接输出就是每段连续区间的起止；要前几名就对 days 开窗，要全量就不加过滤——区间信息从分组那一刻就免费得到了。" }], tags: ["连续登录", "row_number", "日期"]
+    },
+    {
+      id: "LAB-002", category: "高频 SQL 手撕题", question: "给定注册表和登录表，计算每日新用户的次日及 7 日留存率。", frequency: 5,
+      answer: `①以注册日新用户为分母，先将登录日志去重到用户日粒度。②按 user_id 关联注册表，用 datediff(login_dt, reg_dt) 判断第 1 天和第 7 天是否回访，条件去重计数作为分子。③按注册日聚合，分子除以注册人数并防止除零；必须提前约定“7 日留存”指第 7 日而非 7 日内。`,
+      detail: "下面计算严格第 1 日和第 7 日留存。\n```sql\nCREATE TABLE user_register(user_id BIGINT, register_time TIMESTAMP) STORED AS ORC;\nCREATE TABLE user_login(user_id BIGINT, login_time TIMESTAMP) STORED AS ORC;\n\nWITH r AS (SELECT user_id,to_date(register_time) reg_dt FROM user_register),\nl AS (SELECT DISTINCT user_id,to_date(login_time) login_dt FROM user_login)\nSELECT r.reg_dt,\n       count(DISTINCT r.user_id) new_users,\n       count(DISTINCT CASE WHEN datediff(l.login_dt,r.reg_dt)=1 THEN r.user_id END) d1_users,\n       round(count(DISTINCT CASE WHEN datediff(l.login_dt,r.reg_dt)=1 THEN r.user_id END)\n             / nullif(count(DISTINCT r.user_id),0),4) d1_rate,\n       round(count(DISTINCT CASE WHEN datediff(l.login_dt,r.reg_dt)=7 THEN r.user_id END)\n             / nullif(count(DISTINCT r.user_id),0),4) d7_rate\nFROM r LEFT JOIN l ON r.user_id=l.user_id AND datediff(l.login_dt,r.reg_dt) IN (1,7)\nGROUP BY r.reg_dt;\n```\n部分 Hive 版本无 nullif，可改用 CASE。",
+      followUp: [{ q: "滚动 7 日留存怎么定义和实现？", a: "先定口径再说实现：常见定义是“注册后第 1 至 7 日内任意一天回访”（区间内存在即可），严格版要求 7 日连续（很少见）；实现上把 datediff 条件改成 between 1 and 7 即可，关键是和需求方把定义写进指标字典。" }, { q: "注册当天也登录要不要计入？", a: "不计入：留存的分母是当日新用户，分子是其后第 N 天的回访者，注册当天的活跃属于“新增活跃”而非留存；但要留意很多产品对“新增”本身要求注册且激活，先把分子分母口径都对齐。" }], tags: ["留存率", "次日留存", "条件聚合"]
+    },
+    {
+      id: "LAB-003", category: "高频 SQL 手撕题", question: "求每个品类销售额最高的 3 个商品，要求保留并列第三名。", frequency: 5,
+      answer: `①先按品类、商品聚合销售额，不能直接在明细上排名，否则是一笔订单的 TopN。②在品类分区内按销售额降序使用 dense_rank；它让并列同名次且后续不跳号，因此会保留所有并列第三。③外层过滤排名不大于 3，并追加商品 ID 仅用于结果稳定展示，不能改变并列判定。`,
+      detail: "先汇总再排名是关键；若题目只要恰好三行，应改用 row_number。\n```sql\nCREATE TABLE order_item(category_id BIGINT,product_id BIGINT,pay_amount DECIMAL(18,2),dt STRING) STORED AS ORC;\n\nWITH s AS (\n  SELECT category_id,product_id,sum(pay_amount) sales\n  FROM order_item WHERE dt BETWEEN '${start_dt}' AND '${end_dt}'\n  GROUP BY category_id,product_id\n), r AS (\n  SELECT *,dense_rank() OVER(PARTITION BY category_id ORDER BY sales DESC) rk FROM s\n)\nSELECT category_id,product_id,sales,rk FROM r WHERE rk<=3;\n```",
+      followUp: [{ q: "如果每组只允许返回 3 行怎么办？", a: "改用 row_number 并加确定性 tiebreaker（销售额相同按商品 ID），rn<=3 恰好三行；代价是并列者被随机牺牲，所以答完要补一句：这个口径变化必须和需求方确认“并列是否全保留”。" }, { q: "TopN 数据量很大如何优化？", a: "核心是减少参与排序的数据：先在子查询按品类加商品预聚合（题中已做），更大规模时在 map 端或各 reducer 内先局部 TopN 再全局合并；引擎层用 sort by 加 limit 的分布式 TopN，避免全排序进单点。" }], tags: ["TopN", "dense_rank", "分组排名"]
+    },
+    {
+      id: "LAB-004", category: "高频 SQL 手撕题", question: "根据曝光、点击、加购、支付事件，计算用户转化漏斗。", frequency: 5,
+      answer: `①先明确漏斗窗口、去重口径和是否要求严格顺序；按用户聚合各步骤首次时间。②后一步只有发生时间晚于前一步且在窗口内才算有效到达，避免简单按事件类型计数造成逆序转化。③汇总各层用户数，并分别计算相邻转化率和总体转化率；分母为零时返回 null 或约定值。`,
+      detail: "示例为注册观察窗内严格顺序漏斗。\n```sql\nCREATE TABLE user_event(user_id BIGINT,event_type STRING,event_time TIMESTAMP,dt STRING) STORED AS ORC;\n\nWITH t AS (\n SELECT user_id,\n  min(CASE WHEN event_type='expose' THEN event_time END) t1,\n  min(CASE WHEN event_type='click' THEN event_time END) t2,\n  min(CASE WHEN event_type='cart' THEN event_time END) t3,\n  min(CASE WHEN event_type='pay' THEN event_time END) t4\n FROM user_event WHERE dt BETWEEN '${start_dt}' AND '${end_dt}' GROUP BY user_id\n), f AS (\n SELECT user_id,t1,\n  CASE WHEN t2>t1 THEN t2 END v2,\n  CASE WHEN t3>t2 AND t2>t1 THEN t3 END v3,\n  CASE WHEN t4>t3 AND t3>t2 AND t2>t1 THEN t4 END v4 FROM t\n)\nSELECT count(t1) expose_uv,count(v2) click_uv,count(v3) cart_uv,count(v4) pay_uv,\n       count(v2)/nullif(count(t1),0) click_rate,\n       count(v4)/nullif(count(t1),0) total_rate FROM f;\n```\n复杂多次路径可用窗口状态机或 CEP。",
+      followUp: [{ q: "同一用户多次进入漏斗如何归因？", a: "先定义“一次旅程”：按会话或活动窗口切分（每次曝光开启一段旅程），在旅程内判断严格顺序，再跨旅程汇总；或者只统计首次完整路径；分母分子必须来自同一段旅程，否则会出现转化率大于 1 的怪象。" }, { q: "Flink CEP 如何实现实时漏斗？", a: "keyBy 用户后用 CEP 模式定义步骤序列（expose 到 click 到 cart 到 pay），within 设转化窗口，匹配成功发转化事件；乱序靠 watermark 加 allowedLateness，超时未完成的旅程进侧输出统计流失率。" }], tags: ["漏斗", "转化率", "事件顺序"]
+    },
+    {
+      id: "LAB-005", category: "高频 SQL 手撕题", question: "给定用户上线和下线时间，求一天内峰值同时在线人数及发生时刻。", frequency: 5,
+      answer: `①把每个会话拆成上线 +1、下线 -1 两条边界事件，再按时间排序做累积和，当前累计值就是在线人数。②同一时刻的上下线必须先约定区间语义；若会话为左闭右开，应同一时刻先处理 -1 或先合并净变化。③对累计值降序取第一名得到峰值，并保留并列峰值时刻。`,
+      detail: "下面先合并同一时刻净变化，采用 [login_time,logout_time) 语义。跨天会话需先裁剪到统计日边界。\n```sql\nCREATE TABLE user_session(user_id BIGINT,login_time TIMESTAMP,logout_time TIMESTAMP) STORED AS ORC;\n\nWITH e AS (\n SELECT login_time ts,1 delta FROM user_session\n UNION ALL\n SELECT logout_time ts,-1 delta FROM user_session\n), p AS (\n SELECT ts,sum(delta) delta FROM e GROUP BY ts\n), c AS (\n SELECT ts,sum(delta) OVER(ORDER BY ts ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) online_cnt FROM p\n), r AS (\n SELECT *,dense_rank() OVER(ORDER BY online_cnt DESC) rk FROM c\n)\nSELECT ts,online_cnt FROM r WHERE rk=1 ORDER BY ts;\n```",
+      followUp: [{ q: "会话跨天如何统计指定自然日？", a: "按统计日边界裁剪会话：login 早于当日零点的从零点起算，logout 晚于当日 24 点的截到 24 点（跨多天就拆成多段），再做扫描线累积；不裁剪的话，边界溢出会把人数错记到别的日期。" }, { q: "同一用户重叠会话只算一次怎么做？", a: "两层扫描线：第一层按用户分区做累积和，把 sum 大于 0 的连续段合并为该用户的去重区间；第二层对合并后的区间做全局 +1/-1 扫描线求峰值——先去重到人，再算同时在线。" }], tags: ["同时在线", "扫描线", "累积和"]
+    },
+    {
+      id: "LAB-006", category: "高频 SQL 手撕题", question: "将学生多行科目成绩转成一行的语文、数学、英语三列。", frequency: 4,
+      answer: `①目标是一名学生一行，先确认同一学生同一科目是否唯一；若不唯一，明确取最高、最新或平均值。②使用条件聚合，把不同科目映射到对应列，group by 学生 ID。③固定科目适合静态 SQL；科目动态增长时需由元数据生成列，或保留 map 结构，纯 SQL 无法动态生成 Schema。`,
+      detail: "示例假设同一学生科目唯一，max 只是把单个非空值提出来。\n```sql\nCREATE TABLE student_score(student_id BIGINT,subject STRING,score DECIMAL(5,2)) STORED AS ORC;\n\nSELECT student_id,\n       max(CASE WHEN subject='语文' THEN score END) chinese_score,\n       max(CASE WHEN subject='数学' THEN score END) math_score,\n       max(CASE WHEN subject='英语' THEN score END) english_score\nFROM student_score GROUP BY student_id;\n```\n若要缺考显示 0，可在外层 coalesce，但要确认 0 与缺失的业务含义不同。",
+      followUp: [{ q: "同科目多条成绩取最新如何写？", a: "先用 row_number 按学生加科目分区、按时间或版本号降序取 rn=1，得到每科最新一条，再做条件聚合行转列；千万别用 max(score) 冒充“最新”——那是分数最高，不是时间最新，两个口径。" }, { q: "动态行转列有哪些实现方式？", a: "三条路：元数据驱动（查类别表由脚本拼接 case when）、把 pivot 交给应用层或 BI 工具、或输出 map 结构（map_agg 后查询侧按键取）；各自代价是生成器复杂度、计算位置转移和查询便利性，按团队栈选。" }], tags: ["行转列", "条件聚合", "case when"]
+    },
+    {
+      id: "LAB-007", category: "高频 SQL 手撕题", question: "将一行中的语文、数学、英语成绩转换为多行科目成绩。", frequency: 4,
+      answer: `①目标粒度从学生变为学生加科目，每个原始列映射为一个科目值。②Hive 可用 stack 一次生成固定的科目、成绩两列，并配合 lateral view；通用写法也可用 union all。③应明确 null 成绩是否保留：保留表示该科目缺失记录，过滤则表示只输出有成绩的科目。`,
+      detail: "stack 的第一个参数是要生成的行数，后续表达式按目标列数分组。\n```sql\nCREATE TABLE student_wide(student_id BIGINT,chinese_score DECIMAL(5,2),math_score DECIMAL(5,2),english_score DECIMAL(5,2)) STORED AS ORC;\n\nSELECT student_id,subject,score\nFROM student_wide\nLATERAL VIEW stack(3,\n  '语文',chinese_score,\n  '数学',math_score,\n  '英语',english_score\n) s AS subject,score;\n```\n若要过滤空成绩，在外层子查询加 WHERE score IS NOT NULL。",
+      followUp: [{ q: "stack 和 explode 有什么区别？", a: "stack 按“行数加表达式组”直接展开成固定的多行多列，适合已知列结构的列转行；explode 是把 array/map 单列炸开，需要先把数据装进集合类型；可以把 stack 理解为预设结构的语法糖。" }, { q: "列很多时如何维护这段 SQL？", a: "几十列手写不现实：用 desc 或 information_schema 拿列元数据，由脚本生成 stack 参数；或建一张“列名到科目名”的映射配置表驱动生成；原则是重复结构交给生成器，不交给手维护。" }], tags: ["列转行", "stack", "lateral view"]
+    },
+    {
+      id: "LAB-008", category: "高频 SQL 手撕题", question: "一张 CDC 表同一主键有多次更新，如何去重保留最新有效记录？", frequency: 5,
+      answer: `①按业务主键分区，以源端版本号或 binlog 位点降序使用 row_number，不能只依赖可能同秒的更新时间。②外层取 rn=1，再根据操作类型过滤最新为 delete 的记录；必须先取最新再删 delete，否则会错误保留删除前版本。③补充确定性排序字段，并校验重复版本及乱序，保证重跑结果一致。`,
+      detail: "op 为 I/U/D，log_pos 是单调日志位置。\n```sql\nCREATE TABLE order_cdc(order_id BIGINT,status STRING,amount DECIMAL(18,2),op STRING,\n  update_time TIMESTAMP,log_file STRING,log_pos BIGINT,dt STRING) STORED AS ORC;\n\nWITH r AS (\n SELECT *,row_number() OVER(\n   PARTITION BY order_id ORDER BY update_time DESC,log_file DESC,log_pos DESC\n ) rn\n FROM order_cdc WHERE dt<='${bizdate}'\n)\nSELECT order_id,status,amount,update_time\nFROM r WHERE rn=1 AND op<>'D';\n```\n跨 binlog 文件时字符串顺序未必可靠，生产应解析文件序号或使用统一 LSN/GTID。",
+      followUp: [{ q: "为什么不能先过滤 delete 再排名？", a: "会复活已删除的记录：若主键的最新事件是 delete，先过滤后剩下的“最新”就是删除前的版本，rn=1 把它当有效数据留了下来；正确顺序是先对全量事件取最新一条，再按 op 是否为 D 剔除。" }, { q: "更新时间回拨时如何判断最新？", a: "别信业务时间，信日志位置：用 binlog 文件序号加位点（LSN/GTID）这类源端单调递增标识做第一排序键，update_time 只用于展示；回拨、同秒、时区问题就此全部免疫。" }], tags: ["CDC 去重", "row_number", "delete"]
+    },
+
+    {
+      id: "CMP-001", category: "大数据组件原理", question: "请讲一下 HDFS 的读流程。", frequency: 5,
+      answer: `①客户端向 NameNode 请求文件块位置，NameNode 校验权限并返回各 Block 的 DataNode 副本列表，通常按网络距离排序。②客户端直接连接最近 DataNode 流式读取并校验 checksum，读完切换下一块。③副本故障或校验失败会透明切换其他节点并上报；NameNode 只管元数据，不承载文件数据流。`,
+      detail: `客户端会批量获取后续 Block 位置并预取，减少与 NameNode 交互。短路读允许计算节点直接读取本地 DataNode 文件。HDFS 适合大文件顺序吞吐，不适合大量小文件和低延迟随机读取，因为元数据与打开文件开销显著。`,
+      followUp: [{ q: "NameNode 宕机后客户端还能读吗？", a: "分情况答：已经拿到块位置的读取可以继续——数据流是客户端直连 DataNode 的，不经过 NameNode；但打开新文件、获取新块位置会失败；HA 架构下 Standby 接管后恢复。核心是说清“元数据路径与数据路径分离”。" }, { q: "HDFS 如何判断最近副本？", a: "按网络拓扑距离排序：同节点优于同机架，优于同数据中心跨机架，优于跨数据中心；机架感知把节点映射成拓扑路径再算距离；极端情况是短路读——计算与存储同节点时直接读本地文件。" }], tags: ["HDFS", "读流程", "NameNode", "DataNode"]
+    },
+    {
+      id: "CMP-002", category: "大数据组件原理", question: "请讲一下 HDFS 的写流程和副本管道。", frequency: 5,
+      answer: `①客户端向 NameNode 创建文件，NameNode 校验后选择一组 DataNode。②客户端把数据切为 packet，经 DN1→DN2→DN3 管道顺序转发，各节点落盘后确认包沿反方向返回。③一个 Block 写满再申请下一组节点；管道故障时剔除异常节点并重建，NameNode 后续补足副本，最终关闭文件提交元数据。`,
+      detail: `ACK 是按 packet 确认而非整文件确认，客户端维护未确认队列。副本放置通常兼顾本机或同机架写入与跨机架容灾。HDFS 采用一次写入、多次读取语义，追加受支持但不适合频繁随机修改。`,
+      followUp: [{ q: "为什么副本不是客户端分别写三次？", a: "管道式把客户端出口带宽降为一份：客户端只发给 DN1，由 DN1 到 DN2 到 DN3 顺次转发，集群内网带宽远比客户端充裕；ack 逐级返回完成确认；若客户端直连写三份，出口流量和跨机房开销都放大三倍。" }, { q: "写到一半 DataNode 失败怎么办？", a: "管道自愈：把故障节点剔除、用剩余节点继续写并重建管道，必要时换新节点入管；客户端未确认 packet 队列负责重发；NameNode 事后发现副本不足会调度补足，对上层应用透明。" }], tags: ["HDFS", "写流程", "副本", "Pipeline"]
+    },
+    {
+      id: "CMP-003", category: "大数据组件原理", question: "YARN 的核心组件和作业提交流程是什么？", frequency: 5,
+      answer: `①ResourceManager 负责全局资源与调度，NodeManager 管理单机 Container，ApplicationMaster 管理单个应用生命周期。②客户端提交应用包后，RM 先分配 Container 启动 AM；AM 注册并按任务需求申请资源。③NM 启动任务 Container，AM 跟踪重试，完成后注销。资源按内存、CPU 等容器化分配。`,
+      detail: `RM 内部常分 ApplicationsManager 和 Scheduler，后者只做资源分配，不负责业务任务容错。不同计算框架拥有自己的 AM。Capacity/Fair Scheduler 用队列、配额与抢占实现多租户隔离，排查排队需看队列上限和 AM 资源。`,
+      followUp: [{ q: "ApplicationMaster 失败会怎样？", a: "RM 检测到 AM 失联后按重试策略在新 Container 里重启它（有次数上限）；新 AM 重建任务状态，能否保留已完成 task 取决于框架的恢复能力；答出“AM 是应用单点但有重试与恢复机制兜底”就完整了。" }, { q: "YARN 的 Container 和 Docker 容器一样吗？", a: "不一样：YARN Container 本质是资源抽象（多少内存、多少 CPU）加进程启动描述，隔离强度取决于实现（进程级、cgroup，新版可配 Docker 运行时）；Docker 是镜像加命名空间的完整隔离体系——别把资源配额当成虚拟化。" }], tags: ["YARN", "ResourceManager", "ApplicationMaster"]
+    },
+    {
+      id: "CMP-004", category: "大数据组件原理", question: "MapReduce Shuffle 的完整过程是什么？", frequency: 5,
+      answer: `①Map 输出先进入环形缓冲区，达到阈值后按分区排序并 Spill，本地多段再归并，可选 Combiner 和压缩。②Reduce 通过网络拉取属于自己的各 Map 分区，在内存和磁盘归并排序。③相同 key 分组后调用 reduce 写出。Shuffle 核心包括分区、排序、溢写、拷贝、归并，是网络与磁盘开销中心。`,
+      detail: `Partitioner 决定 key 去哪个 Reducer，排序保证同 Reducer 内 key 有序，GroupingComparator 决定哪些 key 作为一组。Combiner 只适用于满足结合律、交换律且输入输出类型兼容的操作，执行次数不确定，不能用于求平均的最终逻辑。`,
+      followUp: [{ q: "Combiner 为什么不能保证执行？", a: "Combiner 是纯优化不是语义保证：框架可在各次 spill 前后执行零到多次，取决于溢出情况；所以业务逻辑不能依赖它——只有满足结合律交换律且输入输出类型一致的操作（sum、max）才安全，平均值必须拆成 sum 加 count。" }, { q: "Reduce 数如何影响 Shuffle？", a: "Reduce 数就是分区数：太少则单个 reduce 数据量大、并行度不足、输出文件巨大；太多则每个 map 要切更多分区、小文件变多、归并与连接开销上升；按数据量与槽位估算，并注意倾斜会让“平均分”失效。" }], tags: ["MapReduce", "Shuffle", "Spill", "Combiner"]
+    },
+    {
+      id: "CMP-005", category: "大数据组件原理", question: "Hive SQL 从提交到执行经历哪些环节？", frequency: 5,
+      answer: `①Driver 接收 SQL，经 Parser 生成 AST，语义分析结合 Metastore 校验表、列和类型，形成逻辑计划。②优化器执行分区裁剪、谓词下推、列裁剪、Join 重排等规则与成本优化，生成物理计划。③计划提交 Tez、Spark 或 MapReduce 执行，任务读写 HDFS，结果返回或落表。Hive 本身主要提供 SQL 与元数据层。`,
+      detail: `Metastore 保存表 Schema、分区和统计信息，不保存实际数据。执行引擎决定 DAG 与运行方式。EXPLAIN 可查看计划，ANALYZE 收集的统计信息影响 CBO。HiveServer2 提供会话、认证和 JDBC 接入。`,
+      followUp: [{ q: "Hive 元数据存在哪里？", a: "Metastore 服务加后端关系库（MySQL/PostgreSQL）：表结构、分区信息、列统计都在 RDBMS 里，Metastore 提供统一访问服务；数据本体在 HDFS 或对象存储——所以 Metastore 后端库是核心资产，必须高可用加备份。" }, { q: "语法树和执行 DAG 有什么区别？", a: "阶段与形态不同：AST 忠实于 SQL 文本的语法结构，经语义分析和优化器后才生成逻辑、物理计划；DAG 是物理执行层的算子有向图（节点是 Map/Reduce 阶段，边是 Shuffle）；同一棵 AST 可以被优化成不同 DAG。" }], tags: ["Hive", "执行原理", "优化器", "Metastore"]
+    },
+    {
+      id: "CMP-006", category: "大数据组件原理", question: "Spark 相比 MapReduce 为什么更快？它一定更快吗？", frequency: 5,
+      answer: `①Spark 以 DAG 切分 Stage，将可流水执行的窄依赖合并，减少 MapReduce 每轮固定落盘与作业启动开销。②中间数据可缓存内存，适合迭代计算和交互分析，并有更丰富执行优化。③它并非总更快：内存不足会 Spill，简单一次性超大批处理差距有限；性能仍取决于算法、倾斜、序列化和资源配置。`,
+      detail: `MapReduce 通常每个作业 Map、Shuffle、Reduce 后把结果落 HDFS，多步流程开销大；Spark 只在宽依赖处分 Stage，Stage 内算子管道执行。Spark 的内存计算不是“所有数据必须在内存”，不足时会落盘并重算丢失分区。`,
+      followUp: [{ q: "什么是窄依赖和宽依赖？", a: "看子分区与父分区的对应关系：窄依赖是一对一或固定少量（map、filter），可在同一 Stage 内流水线执行；宽依赖是多对多、需按 key 重新分区（groupBy、join），构成 Stage 边界并触发 Shuffle；两者的容错重算代价也完全不同。" }, { q: "Spark 内存不足会发生什么？", a: "降级而非失败：缓存按策略逐出或选择不缓存，Shuffle 与聚合数据 Spill 到磁盘，丢失的分区按血统重算；代价是性能下降，极端配置下才会 OOM——面试要纠正“Spark 等于全内存计算”的误解。" }], tags: ["Spark", "MapReduce", "DAG", "内存计算"]
+    },
+    {
+      id: "CMP-007", category: "大数据组件原理", question: "Spark Shuffle 为什么发生？常见优化方向有哪些？", frequency: 5,
+      answer: `①宽依赖算子需要按 key 重新分区，如 groupByKey、reduceByKey、join、distinct 和 repartition，因此发生 Shuffle。②Map 端按分区写 Shuffle 文件，Reduce 端拉取、聚合并可能 Spill。③优化应减少 Shuffle 数据量，优先 map-side combine、过滤和预聚合；选择合理分区数、序列化与压缩，并处理倾斜及复用 Exchange。`,
+      detail: `reduceByKey 比 groupByKey 更优，因为能在 Map 端先合并。Spark SQL 的 AQE 可动态合并小分区、转换广播 Join 和处理倾斜分区。repartition 会 Shuffle，coalesce 减少分区时通常可避免全量 Shuffle，但可能形成不均衡。`,
+      followUp: [{ q: "reduceByKey 为什么优于 groupByKey？", a: "reduceByKey 能在 map 端先做局部合并，Shuffle 的数据量直接降一个量级；groupByKey 把全部 value 原样拉取过去再分组，没有任何预聚合；只有确实需要全量 value 的场景才用后者（或改用更合适的数据结构）。" }, { q: "AQE 能解决哪些 Shuffle 问题？", a: "三类：运行时合并过小的 Shuffle 分区、按实际统计把 sort-merge join 动态转广播 join、自动识别并拆分倾斜的 join 分区；它依赖 Stage 间的运行时统计，但救不了单个超级热点键，也替代不了你选错的分区键。" }], tags: ["Spark Shuffle", "宽依赖", "AQE"]
+    },
+    {
+      id: "CMP-008", category: "大数据组件原理", question: "HBase 的架构和一次读写流程是什么？", frequency: 4,
+      answer: `①HMaster 管理表和 Region 分配，RegionServer 服务读写，ZooKeeper 协调；表按 RowKey 范围切成 Region。②写入先追加 WAL，再写 MemStore，达到阈值 Flush 成 HFile，后台 Compaction 合并。③读取先查 BlockCache、MemStore，再查 HFile，通过 BloomFilter 和索引减少扫描，多版本按时间戳合并返回。`,
+      detail: `HDFS 提供底层持久化和副本，WAL 保障 RegionServer 故障后的重放。LSM 结构把随机写转为顺序追加，代价是读放大和 Compaction。RowKey 设计决定访问路径与负载分布，热点前缀会让单个 Region 过载。`,
+      followUp: [{ q: "HBase 为什么写快？", a: "LSM 结构把随机写变成顺序追加：先写 WAL（顺序 IO 保证持久性），再写内存 MemStore 即返回，落盘交给后台 Flush 与 Compaction；代价是读放大和写放大被转移到了查询与后台——答出这个取舍才完整。" }, { q: "如何避免 RowKey 热点？", a: "打散单调前缀：时间戳、自增 ID 放 RowKey 开头会让写入永远挤在尾部 Region；常用散列前缀（md5 截断）、反转或 salt 分桶；同时要兼顾常用查询的前缀扫描能力，在热点与可扫性之间取平衡。" }], tags: ["HBase", "Region", "WAL", "LSM"]
+    },
+    {
+      id: "CMP-009", category: "大数据组件原理", question: "DolphinScheduler、Azkaban、Airflow 有什么区别？", frequency: 4,
+      answer: `①三者都做 DAG 调度、依赖、重试和告警。DolphinScheduler 面向大数据多租户，提供可视化编排、Worker 分组和较丰富任务插件。②Azkaban 部署简单、以 Flow 为核心，适合较传统 Hadoop 批任务。③Airflow 用 Python 定义 DAG，扩展生态强、工程灵活，但动态 DAG 与调度器治理要求更高。选型看团队和生态。`,
+      detail: `不要只比较 UI，应关注高可用、补数、参数传递、资源隔离、权限审计、跨周期依赖和大规模 DAG 解析能力。调度系统负责任务编排，不替代 YARN/Kubernetes 等计算资源调度器。`,
+      followUp: [{ q: "调度系统和资源调度系统有何区别？", a: "层次不同：任务调度（DolphinScheduler、Azkaban、Airflow）管 DAG 依赖、时间与数据触发、重试补数，回答“什么时候跑、按什么顺序跑”；资源调度（YARN、K8s）管 CPU 内存的分配与隔离，回答“跑在哪、给多少资源”；前者把任务提交给后者执行。" }, { q: "Airflow 的 DAG 为什么不建议在运行时动态变化？", a: "调度器周期性重新解析 DAG 文件：运行时动态增删任务会让历史运行实例与当前定义错位，重跑和补数语义混乱、Web 展示错乱；动态需求应使用动态任务映射等声明式特性，而不是在代码里写运行期分支。" }], tags: ["DolphinScheduler", "Azkaban", "Airflow"]
+    },
+    {
+      id: "CMP-010", category: "大数据组件原理", question: "调度系统如何设计依赖、重跑和补数，避免重复或漏算？", frequency: 4,
+      answer: `①任务以业务日期参数化，声明数据依赖而非只按固定时钟触发；上游实例成功且数据就绪后再运行。②每个实例幂等写临时分区并原子提交，失败从安全点重跑。③补数按日期生成独立实例，遵循依赖拓扑限流回放，并记录版本、影响范围和审计；跨周期依赖要显式表达。`,
+      detail: `“任务成功”不等于“数据可用”，可在依赖后增加产出行数、分区完成标记和质量门禁。补数不能直接把当前维表关联历史事实，要使用历史版本或快照。大量补数需与日常 SLA 队列隔离。`,
+      followUp: [{ q: "任务成功但产出为空怎么办？", a: "把任务状态与数据状态解耦：依赖判断不能只看“任务成功”，要加数据就绪信号——分区完成标志、行数下限、质量规则；产出为空先区分“源端本来没数”（合法空窗）和“链路漏数”（故障），再决定阻塞下游还是放行。" }, { q: "补数如何不影响当天正常任务？", a: "资源与节奏隔离：补数走独立队列或低优先级资源组，按依赖拓扑限流回放，避开业务高峰窗口；大补数前评估对存储和源库的压力并知会相关方——很多补数事故不是算错，是把当天正常任务挤死了。" }], tags: ["任务调度", "补数", "幂等", "依赖"]
+    },
+
+    {
+      id: "RT-001", category: "实时数仓", question: "Lambda 和 Kappa 架构有什么区别？如何选择？", frequency: 5,
+      answer: `①Lambda 同时维护离线批处理和实时速度层，再由服务层合并，历史重算能力强但两套代码易产生口径不一致。②Kappa 以不可变日志为统一来源，用同一流处理链路实时计算，历史重算通过回放日志，架构更简洁。③数据量巨大、复杂离线算法多时 Lambda 更稳；流批一体和日志可长期回放时优先 Kappa。`,
+      detail: `Kappa 不是没有批处理，而是把批看成有界流。真正选择要看 Kafka 保留期、回放速度、状态规模、修正频率和团队能力。很多企业实践是核心明细统一、实时指标走流，复杂历史回刷仍用批引擎的混合架构。`,
+      followUp: [{ q: "Kappa 如何修复一个月前的错误口径？", a: "靠日志回放：修好代码后从一个月前的 offset 重放 Kafka，用新结果覆盖旧的；前提是日志保留期够长、回放吞吐可行、状态可重建；保留期不够就得退回批快照补数——这正是现实中混合架构大量存在的原因。" }, { q: "流批一体是否等于 Kappa？", a: "不等于：流批一体是引擎能力（同一套 API 或 SQL 处理有界与无界数据），Kappa 是架构范式（单一不可变日志源加一条流链路承载全部计算）；完全可以用流批一体引擎去落地 Lambda——两个概念不在同一层。" }], tags: ["Lambda", "Kappa", "流批一体"]
+    },
+    {
+      id: "RT-002", category: "实时数仓", question: "Flink 中事件时间、处理时间和 Watermark 分别是什么？", frequency: 5,
+      answer: `①事件时间是事件实际发生时刻，能在乱序下得到业务正确结果；处理时间是算子看到事件的机器时间，延迟低但结果受运行波动影响。②Watermark 是对事件时间进度的估计，表示通常不再期待早于该时间的数据，用于触发窗口。③延迟容忍越大结果越完整但出数越慢，需结合乱序分布设置。`,
+      detail: `Watermark 不是一条真实业务事件，也不会自动丢弃迟到数据；是否接纳由 allowed lateness、侧输出和自定义逻辑决定。多分区时算子 Watermark 取上游最小值，空闲分区会拖住进度，需配置 idleness。`,
+      followUp: [{ q: "Watermark 为什么取上游最小值？", a: "Watermark 的语义是“早于该时间的数据通常都已到达”，只有取所有上游分区的最小值这个保证才成立——任何一个慢分区没到的数据都意味着整体还没到；由此自然引出空闲分区拖进度的问题和 withIdleness 配置。" }, { q: "迟到数据有哪些处理方式？", a: "四件套按口径选：allowedLateness 内更新窗口结果（输出修正）、侧输出流收集另行处理、超容忍直接丢弃（必须监控丢弃量）、业务层离线校准兜底；核心判断是下游能否接受结果修正。" }], tags: ["Flink", "Watermark", "事件时间"]
+    },
+    {
+      id: "RT-003", category: "实时数仓", question: "Flink 的 Keyed State 和 Operator State 有什么区别？", frequency: 5,
+      answer: `①Keyed State 仅用于 keyed stream，状态按 key 隔离并随 key-group 重分配，适合聚合、去重和定时器。②Operator State 绑定并行算子实例，重分区时按列表或广播规则重新分配，常用于 Source 分区位点。③状态由 StateBackend 管理并通过 Checkpoint 持久化，应配置 TTL 控制无限增长。`,
+      detail: `Keyed State 逻辑上每个 key 独立，物理上按 key-group 分配到并行子任务，因此修改并行度仍能恢复。Broadcast State 是 Operator State 的特殊形式，让规则流广播到所有并行实例。TTL 是清理策略，不应代替业务正确的过期语义。`,
+      followUp: [{ q: "修改并行度后 Keyed State 如何迁移？", a: "靠 key-group 重分配：key 先哈希到固定数量的 key-group，key-group 再分配到并行子任务；改并行度只是 key-group 的重新映射，状态后端按新分配恢复——这就是 Keyed State 支持弹性扩缩容的机制。" }, { q: "状态 TTL 到期是否立即删除？", a: "不一定：默认惰性清理，下次访问该状态时发现过期才删；后台主动清理取决于状态后端（如 RocksDB 靠 compaction filter 配置）；别把 TTL 当精确过期器，业务上的硬过期要自己用 Timer 或逻辑判断。" }], tags: ["Flink State", "Keyed State", "StateBackend"]
+    },
+    {
+      id: "RT-004", category: "实时数仓", question: "Flink Checkpoint 的原理是什么？和 Savepoint 有何区别？", frequency: 5,
+      answer: `①JobManager 向 Source 注入 Barrier，Barrier 随数据流传播；算子在收到各输入 Barrier 后对状态和位点做一致性快照，Sink 同步提交。②对齐模式会暂存快通道数据，无对齐模式把在途数据一并快照以降低反压延迟。③Checkpoint 自动容错且可清理，Savepoint 由用户触发、长期保留，用于升级迁移。`,
+      detail: `Checkpoint 基于 Chandy-Lamport 思想。状态通常增量上传到持久存储，完成后 JobManager 记录成功元数据。若 Barrier 长时间对齐，常说明反压或输入不均衡。升级从 Savepoint 恢复需保持算子 uid 稳定以映射状态。`,
+      followUp: [{ q: "Barrier 会不会阻塞所有数据？", a: "对齐模式下只阻塞“跑得快的那条输入通道”：先到 Barrier 的通道暂停消费并缓冲，各通道到齐后做快照再放行；反压大时对齐时间会拉长，于是有了非对齐 Checkpoint——把在途数据一并快照，换更小的停顿。" }, { q: "为什么升级任务要显式设置 uid？", a: "状态恢复按算子 uid 映射：不显式设置时 uid 由拓扑结构自动生成，改动 DAG（哪怕只是挪动算子位置）就会变化，Savepoint 里的状态便对不上新作业；显式 uid 让状态在版本升级间可迁移。" }], tags: ["Checkpoint", "Savepoint", "Barrier"]
+    },
+    {
+      id: "RT-005", category: "实时数仓", question: "Flink 如何实现端到端 Exactly-Once？", frequency: 5,
+      answer: `①Source 必须能按 Checkpoint 恢复精确读取位点，算子状态与位点进入同一一致性快照。②失败后从最近成功 Checkpoint 重放，内部状态不会重复生效。③Sink 需支持两阶段提交事务，随 Checkpoint 预提交并在全局成功后提交；或以稳定业务键幂等 Upsert。任何一环不支持，端到端只能至少一次。`,
+      detail: `Kafka Source 位点随 Checkpoint 保存，不依赖自动提交。Kafka Sink 可使用事务；数据库 Sink 可用 XA、两阶段提交或幂等键。Checkpoint 成功前外部系统若已可见写入，失败重放就会重复，因此 Sink 语义是关键。`,
+      followUp: [{ q: "两阶段提交会遇到事务超时吗？", a: "会，这是实践大坑：预提交事务挂得太久会被下游中止（Kafka 事务超时、数据库锁超时），提交阶段随即失败；要按 Checkpoint 间隔调大事务超时、监控悬挂事务，并理解失败后是走 Checkpoint 恢复重放的。" }, { q: "幂等写与事务写各有什么代价？", a: "幂等写简单低耦合，但要求稳定业务键，且读侧可能短暂看到中间态（适合状态型表、不适合事件流）；事务写读隔离好（read_committed 才可见），代价是协调开销、事务超时和系统支持门槛——按下游消费形态选。" }], tags: ["Exactly-Once", "两阶段提交", "幂等"]
+    },
+    {
+      id: "RT-006", category: "实时数仓", question: "Kafka 为什么吞吐量高？", frequency: 5,
+      answer: `①分区让读写可横向并行，消息按分区追加，避免随机写。②Producer 批量聚合并压缩消息，Broker 利用顺序磁盘 IO、页缓存和零拷贝降低系统调用与复制成本。③Consumer Pull 模式按偏移批量拉取，多个消费组独立读取。高吞吐来自端到端批处理与顺序访问，不代表单条延迟永远最低。`,
+      detail: `现代磁盘顺序写配合 OS Page Cache 吞吐很高。sendfile 等零拷贝减少用户态与内核态拷贝。batch.size、linger.ms、compression.type 能提升吞吐但会增加等待或 CPU，需按时延目标权衡。`,
+      followUp: [{ q: "分区数越多吞吐一定越高吗？", a: "不是：分区提高并行度上限，但每个分区都消耗文件句柄、内存与副本开销，分区越多 Broker 故障恢复越慢，端到端延迟可能上升；消费端并行度还封顶于分区数——按吞吐目标、key 基数与运维成本权衡，而非越大越好。" }, { q: "零拷贝减少了哪些拷贝？", a: "传统路径是磁盘到内核缓冲到用户态缓冲到 socket 缓冲到网卡，四次拷贝加两次上下文切换；sendfile 让数据在内核空间直接流转，省掉内核与用户态之间的来回拷贝，CPU 与内存带宽都省下来。" }], tags: ["Kafka", "高吞吐", "顺序写", "零拷贝"]
+    },
+    {
+      id: "RT-007", category: "实时数仓", question: "Kafka 如何保证消息可靠且有序？", frequency: 5,
+      answer: `①分区副本由 Leader 处理读写，Follower 复制；acks=all 要求 ISR 中副本确认，结合 min.insync.replicas 防止副本不足时冒险写入。②Producer 开启幂等可避免重试重复，事务可跨分区原子写。③Kafka 只保证单分区内顺序，全局有序需单分区；消费端位点提交要与处理结果一致。`,
+      detail: `unclean leader election 若允许非 ISR 副本当 Leader，可能丢失已确认消息。业务 key 决定分区，可保证同一订单有序。Consumer 先提交 offset 再处理会丢，处理后提交会重复，通常配合幂等或事务消费处理。`,
+      followUp: [{ q: "ISR 是什么？", a: "与 Leader 保持同步的副本集合，落后太多会被踢出：acks=all 只等待 ISR 确认，min.insync.replicas 设确认下限；Leader 宕机从 ISR 中选新主才不会丢已确认消息——配合关闭 unclean leader election 才构成完整可靠性语义。" }, { q: "Kafka 为什么无法低成本保证全局有序？", a: "全局有序等于全局单点：跨分区排序需要所有分区互相同意顺序，要么退回单分区（并行度与吞吐归零），要么消费端做全量排序缓冲；Kafka 的取舍就是“分区内有序加按 key 路由”，把顺序需求约束在业务键粒度。" }], tags: ["Kafka 可靠性", "ISR", "幂等 Producer"]
+    },
+    {
+      id: "RT-008", category: "实时数仓", question: "ClickHouse、Doris、StarRocks 如何对比选型？", frequency: 5,
+      answer: `①ClickHouse 单表扫描聚合极强、生态成熟，适合日志明细和高吞吐 OLAP，但分布式 Join 与高频更新治理要求较高。②Doris、StarRocks 都强调 MPP、向量化、MySQL 协议和实时分析，主键模型、更新与多表 Join 更友好。③选型应实测数据模型、并发、更新、Join、导入、运维及成本，不能只看跑分。`,
+      detail: `三者版本演进快，功能边界不断变化。ClickHouse MergeTree 通过后台合并组织数据；Doris/StarRocks 有 Duplicate、Aggregate、Unique/Primary Key 等模型。StarRocks 强调 CBO 与湖仓查询，Doris 在易用和一体化分析方面活跃，最终以当前版本 PoC 为准。`,
+      followUp: [{ q: "主键模型如何支持更新？", a: "写入仍是追加新版本：Doris Unique、StarRocks Primary Key 在 compaction 或查询合并时按主键保留最新版本，StarRocks 还维护主键索引加速定位；本质是“读时/合并时去重”换写入简单，和 Hive 拉链是两种取舍。" }, { q: "为什么 ClickHouse 不适合直接替代所有数仓层？", a: "它的强项是单表大扫描聚合，弱项同样鲜明：多表关联要手工做数据布局、更新删除是异步 mutation 而非实时、事务和约束基本没有；数仓的明细建模、维度关联与口径治理，不能指望一个 OLAP 引擎全部包办。" }], tags: ["ClickHouse", "Doris", "StarRocks", "OLAP"]
+    },
+    {
+      id: "RT-009", category: "实时数仓", question: "实时数仓如何分层并保证离线、实时口径一致？", frequency: 5,
+      answer: `①实时链路也可划 ODS、DWD、DWS/ADS，但层级宜轻，Kafka Topic 或湖仓表承载标准事件与公共明细。②统一事件模型、维度、指标定义和业务时间语义，流批复用 SQL/代码或由同一指标配置生成。③通过同时间窗双算对账、迟到修正和最终离线校准，避免两套逻辑长期漂移。`,
+      detail: `实时 ODS 保留 CDC/日志原貌，实时 DWD 清洗成业务事件，DWS 做窗口聚合，结果写 OLAP 服务。每层都落 Kafka 会增加延迟与运维，应只对复用、回放或隔离有价值的节点物化。`,
+      followUp: [{ q: "实时链路每层都要落 Kafka 吗？", a: "不必：物化要付出延迟、存储和运维成本，只在有复用、回放或隔离价值的节点落 Topic 或表（典型是 DWD 公共明细）；纯串联的清洗在一个作业内完成即可——分层是逻辑契约，不等于每层都是物理 Kafka Topic。" }, { q: "离线结果覆盖实时结果会不会回退？", a: "会，这是 Lambda 合并层经典坑：实时结果里含有离线尚未处理的最新增量，被离线整表覆盖就倒退；解法是分时段拼接（离线负责 T-1 及以前、实时负责今天），或覆盖时保留实时侧的水位标记。" }], tags: ["实时数仓", "流批一致", "分层"]
+    },
+    {
+      id: "RT-010", category: "实时数仓", question: "实时事实如何关联不断变化的维度？", frequency: 4,
+      answer: `①维度小且变化少可广播到 Flink State，由 CDC 更新；查询外部存储可用异步 IO、缓存和限流降低延迟。②要按当前属性分析可查最新维度，要按事件当时属性分析则需 Temporal Join，根据事件时间匹配维度版本。③必须处理维度迟到、缓存过期、乱序和关联失败，并监控未知键比例。`,
+      detail: `广播状态吞吐高但每个并行实例保存全量，不适合超大维度。异步查询需控制超时、容量和顺序语义。Flink SQL Temporal Table Join 可结合版本表按时间查询，前提是变更日志与主键语义正确。`,
+      followUp: [{ q: "广播维度状态过大怎么办？", a: "广播意味着每个并行实例持有一份全量：放不下就换异步 IO 查外部存储（Redis、HBase、OLAP 库）加 LRU 缓存，或把维度裁剪到需要的列与活跃子集； keyed 查询场景还可提高并行度摊薄每实例的 key 量。" }, { q: "缓存命中但维度已更新如何保证正确？", a: "先定口径：按“当前属性”分析，就缩短 TTL 或用 CDC 主动失效缓存；按“事件当时属性”分析，缓存方案根本不满足，必须上 Temporal Join 匹配维度版本——缓存新鲜度策略要写进数据契约。" }], tags: ["实时维度", "Temporal Join", "异步 IO"]
+    },
+
+    {
+      id: "GOV-001", category: "数据质量与治理", question: "数据质量六大维度是什么？如何理解？", frequency: 5,
+      answer: `①完整性看必需数据是否缺失；准确性看数据是否反映真实业务；一致性看跨表跨系统口径是否相符。②唯一性看主键或业务实体是否重复；及时性看是否在 SLA 内产出；有效性看格式、类型、范围和枚举是否合法。③六维度需转为可量化规则、阈值、负责人和处置流程。`,
+      detail: `不同体系可能把规范性、可用性单列，面试应说明采用的定义。质量不是单一分数：同一字段可能格式有效但业务不准确。规则应绑定数据资产与业务影响等级，核心指标使用更严格阈值和阻断策略。`,
+      followUp: [{ q: "准确性如何自动监控？", a: "准确性最难自动化，因为它衡量的是“数据与真实业务的符合度”：可行手段是与权威源对账（金额、状态逐层比对）、业务规则校验（年龄在合理区间、支付时间不早于下单时间）、跨表逻辑一致性、分布突变的异常检测；承认“权威锚点加规则集，没有全自动银弹”是加分回答。" }, { q: "完整性和有效性有什么区别？", a: "一句话：完整性回答“有没有”，有效性回答“合不合法”。必填字段为空、记录丢失是完整性；格式、类型、范围、枚举值不合法是有效性；举例：手机号缺失是完整性问题，手机号填成 12 位是有效性问题。" }], tags: ["数据质量", "完整性", "准确性", "一致性"]
+    },
+    {
+      id: "GOV-002", category: "数据质量与治理", question: "如何搭建数据质量监控体系？", frequency: 5,
+      answer: `①事前在模型和指标定义阶段配置主键、非空、枚举、范围及 SLA 规则；事中监控任务、行数波动、分布、重复率和跨层对账。②规则按数据等级设静态阈值、同比环比或异常检测，失败可告警、阻断发布或降级。③事后要有负责人、影响分析、修复回刷、复盘和规则沉淀，形成闭环。`,
+      detail: `规则结果需保存检测批次、样本和血缘，避免只发一条无上下文告警。告警要聚合降噪并分级路由。模型升级时质量基线可能合法变化，应走变更审批而不是简单放宽阈值。核心链路可设置质量分和发布门禁，但规则平台自身也要监控执行成功率与覆盖率。`,
+      followUp: [{ q: "行数波动阈值如何设置？", a: "别拍脑袋定静态值：按该表历史波动分布设基线（同比环比分位数、3σ），业务量增长期用动态基线；阈值还要联动业务日历（大促、月末天然波动）；大表看绝对差、小表看比例，分级告警。" }, { q: "什么质量问题应该阻断下游？", a: "会影响决策正确性且不可逆的才阻断：主键重复、核心金额口径错误、大范围 null、跨层对账超阈值；格式类、非核心字段问题降级为告警放行；原则一句话——错数宁可不出数，脏数可以后补。" }], tags: ["质量监控", "SLA", "告警", "闭环"]
+    },
+    {
+      id: "GOV-003", category: "数据质量与治理", question: "什么是元数据管理？技术、业务和操作元数据各包括什么？", frequency: 4,
+      answer: `①技术元数据描述表、字段、类型、分区、任务、存储和血缘；业务元数据描述术语、口径、负责人、数据域和安全等级；操作元数据记录调度状态、产出时间、行数、访问热度与成本。②统一采集、关联和检索这些信息，可支撑找数、影响分析、质量、安全、生命周期和成本治理。`,
+      detail: `元数据平台不能只做目录展示，应接入建表、调度、查询日志、BI 和质量系统，形成自动采集。人工维护的业务口径要有审批和版本。实体间用全局标识关联，才能从一个指标追到字段、任务和源系统。`,
+      followUp: [{ q: "元数据如何自动采集？", a: "对接各系统的接口与日志：Metastore 和 DDL 抓技术元数据，调度系统 API 抓任务与运行状态，查询日志抓访问热度，SQL 解析抓血缘，质量平台抓规则结果；只有业务口径这类人工元数据靠登记加审批——目标是“能不让人填的都不让人填”。" }, { q: "数据目录和元数据平台有什么区别？", a: "目录是平台的一种应用形态：面向找数场景，提供资产清单、搜索和负责人信息；元数据平台还包括血缘、影响分析、质量、安全、生命周期等治理能力；目录是门面，平台是底座。" }], tags: ["元数据", "数据目录", "操作元数据"]
+    },
+    {
+      id: "GOV-004", category: "数据质量与治理", question: "数据血缘如何解析？它能解决哪些问题？", frequency: 5,
+      answer: `①血缘描述数据从源到表、字段、指标和报表的加工依赖。可从 SQL AST 解析静态字段映射，结合调度依赖、运行日志和 API 配置补全动态链路。②表级血缘易建设，字段级需处理别名、表达式、UDF 和动态 SQL。③血缘用于影响分析、根因定位、口径追溯、安全传播和下线评估。`,
+      detail: `仅解析 FROM 表只能得到表级依赖，不能解释目标字段来自哪个表达式。动态拼接 SQL 可在执行后采集实际 SQL 再解析。血缘必须带版本和时间，否则模型变更后看到的当前图无法解释历史产出。`,
+      followUp: [{ q: "UDF 内部血缘怎么处理？", a: "SQL 解析在 UDF 处天然断链：策略是 UDF 注册时人工标注输入输出映射（白盒登记）、对内置标准函数实现解析规则，最差情况保守标记为“依赖全部输入字段”；承认 UDF 和黑盒存储过程是字段级血缘的盲区比假装能解析更专业。" }, { q: "调度依赖能否直接当数据血缘？", a: "不能等同：调度依赖是任务编排关系，可能含无数据交换的控制依赖，也会漏掉同一任务内的多表读写；数据血缘是表和字段的实际加工映射；两者互补校验——血缘缺边查调度，调度冗余边查血缘。" }], tags: ["数据血缘", "SQL AST", "影响分析"]
+    },
+    {
+      id: "GOV-005", category: "数据质量与治理", question: "数仓中的数据安全和脱敏怎么做？", frequency: 5,
+      answer: `①先按敏感性和影响分级分类，遵循最小权限、按角色或属性授权，并对行、列、租户做隔离。②存储和传输加密，手机号、证件等采用掩码、哈希、令牌化或加密，按可逆需求选择。③生产、测试环境隔离，导出和高危查询审批，访问全量审计；脱敏规则应沿血缘向下游传播。`,
+      detail: `哈希适合等值匹配但要加盐防彩虹表；加密可逆，需严格密钥管理；Tokenization 通过映射服务减少明文暴露。动态脱敏按访问者返回不同结果，静态脱敏生成不可逆副本。聚合数据也可能被小样本反推，需设最小群体阈值。`,
+      followUp: [{ q: "哈希和加密如何选择？", a: "按可逆需求选：只需等值匹配（关联、去重）用加盐哈希，不可逆更安全；需要还原明文（外发、客服）用加密并配严格密钥管理；要跨系统一致可逆又不想扩散密钥，用令牌化映射服务；哈希一定记得加盐防彩虹表。" }, { q: "如何防止聚合结果反推个人？", a: "防小样本反推：群体计数设最小阈值（如小于 10 不展示）、抑制可交叉钻取的维度组合、敏感报表做泛化（年龄段化）或加噪；差分隐私是系统化方案，工程底线是“阈值加维度抑制”。" }], tags: ["数据安全", "脱敏", "最小权限", "审计"]
+    },
+    {
+      id: "GOV-006", category: "数据质量与治理", question: "数据生命周期管理包括哪些环节？", frequency: 4,
+      answer: `①从数据创建、热用、归档到删除制定分层保存策略，依据法规、业务追溯、重算窗口和访问热度确定保留期。②热数据放高性能存储，温冷数据降存储等级或压缩归档，过期数据经审批可验证删除。③生命周期策略写入表元数据并自动执行，同时考虑副本、备份、下游派生和法律保留要求。`,
+      detail: `不能只删主表而忽略备份、缓存和导出副本。删除前通过血缘确认依赖，归档后保留可检索目录和恢复流程。分区表优先按时间分区过期，避免逐行删除；重要快照可降冷而非永久放在高性能集群。`,
+      followUp: [{ q: "ODS、DWD、ADS 保留周期应一样吗？", a: "不一样，按重放价值定：ODS 是重放源头，保留最长或按法规要求；DWD 保留覆盖回刷窗口即可；ADS 与报表生命周期绑定，可以最短；一句话——越靠上游越像档案，越靠下游越像缓存。" }, { q: "用户要求删除个人数据如何沿链路执行？", a: "靠血缘加主数据：用 OneID 定位该用户全部记录，沿血缘梳理主表、派生表、备份、缓存和导出文件，分别执行删除或匿名化并留存执行凭证；拉链和历史版本要特殊处理（匿名化或闭链，而不是简单删行导致区间错乱）。" }], tags: ["生命周期", "归档", "数据删除"]
+    },
+    {
+      id: "GOV-007", category: "数据质量与治理", question: "如何做大数据平台的成本治理？", frequency: 4,
+      answer: `①先建立表、任务、查询到团队和业务的成本归属，采集 CPU、内存、Shuffle、存储、副本和扫描量。②识别低使用表、重复模型、长期小文件、全表扫描、资源空转和超配任务，分别做下线、合并、分区、压缩和弹性调度。③以单位数据或指标成本衡量收益，设置预算、配额和持续看板，不能只靠压资源。`,
+      detail: `成本优化要守住 SLA 和正确性。热点数据可缓存或预聚合，冷数据降存储等级，补数与日常任务分队列。通过查询日志统计表的最后访问、消费者和扫描列，结合血缘安全下线，不可凭“近七天没人查”直接删除。`,
+      followUp: [{ q: "如何判断一张表可以下线？", a: "用证据链而非感觉：查询日志看最后访问时间与消费者、血缘看下游依赖、扫描列看使用深度；零依赖加长未访问的先置“候选下线”公示并设只读观察期，再归档删除；还有消费者的先迁移后下线。" }, { q: "Spot 资源适合运行哪些任务？", a: "可中断、可重试、无硬 SLA 的任务：补数回刷、探索性分析、离线测试、错峰批量；核心 SLA 链路和长状态实时任务不适合（抢占中断代价高）；配套自动重试和降级到按量资源的策略。" }], tags: ["成本治理", "FinOps", "资源优化"]
+    },
+    {
+      id: "GOV-008", category: "数据质量与治理", question: "源系统与数仓金额不一致，应该建立怎样的对账机制？", frequency: 5,
+      answer: `①按相同业务边界建立分层对账：源端、ODS、DWD、汇总层分别比较行数、主键数、金额及状态分布，并保留批次水位。②大表可用分区聚合、分桶哈希和抽样定位，差异下钻到业务键。③明确取消、退款、时区、迟到和精度口径，超阈值阻断发布；修复后重跑受影响链路并留审计。`,
+      detail: `总金额相等不代表数据正确，可能正负差异抵消；需同时比主键集合、分布和关键字段哈希。对账应在同一快照点进行，否则在线源库持续变化会造成假差异。财务类可引入借贷或结算凭证作为权威锚点。`,
+      followUp: [{ q: "大表逐行对账成本太高怎么办？", a: "分桶哈希加分层下钻：按分区或主键分桶，每桶聚合行数、金额和、哈希和，桶级一致直接跳过，不一致的桶再下钻明细；配合抽样，把全量逐行比对成本降几个数量级。" }, { q: "源库持续更新时怎样取同一快照？", a: "在线库没有静态快照：用基于事务的一致性导出，或记录起止水位（时间戳、binlog 位点），只比对“水位时刻”的状态，期间变化归入下一批次；财务场景以结算凭证快照为权威锚点。" }], tags: ["数据对账", "金额", "分桶哈希"]
+    },
+
+    {
+      id: "MET-001", category: "指标体系", question: "原子指标、派生指标和衍生指标分别是什么？", frequency: 5,
+      answer: `①原子指标是某业务过程下不可再拆的度量，如支付金额、支付买家数，绑定明确事实和聚合方式。②派生指标由原子指标加统计周期、业务限定和分析维度组成，如近 7 日华东新客支付金额。③衍生指标由一个或多个指标计算得到，如支付转化率、客单价；应保存分子分母并明确单位。`,
+      detail: `不同公司术语可能把复合指标也称衍生指标，回答时先给定义。派生指标公式可表示为原子指标 + 时间周期 + 修饰词 + 维度。指标系统应复用这些结构化元素，而不是给每个报表字段写一段独立 SQL。`,
+      followUp: [{ q: "支付人数是原子指标还是派生指标？", a: "原子指标：它绑定“支付”业务过程，度量是买家去重计数、聚合方式明确，且不带统计周期和修饰限定；加上“近 7 日”“华东”才变成派生指标——判断点就盯那三件修饰（周期、限定、维度）有没有加。" }, { q: "同比、环比属于哪类指标？", a: "衍生指标：由同一派生指标在两个时间窗口上的值计算而来（本期与上期之比）；它不产生新度量，只是已有指标加时间比较逻辑，管理上要复用基指标的定义而不是单独写 SQL。" }], tags: ["原子指标", "派生指标", "衍生指标"]
+    },
+    {
+      id: "MET-002", category: "指标体系", question: "阿里 OneData 体系的核心思想是什么？", frequency: 5,
+      answer: `①OneData 强调统一数据标准、统一模型、统一指标和统一服务，通过数据域、业务过程、总线矩阵及一致性维度减少重复建设。②OneModel 规范分层与公共模型，OneID 统一实体标识，OneMetric 统一指标定义。③目标是数据只加工一次、多场景复用，但落地依赖责任机制、元数据和研发流程，不能只靠命名规范。`,
+      detail: `各企业对 OneData 子体系命名会有差异，核心都是“一致、复用、可治理”。落地可从高价值主题域做总线矩阵、公共维度和指标字典，再通过开发平台把标准转成校验规则，避免先做大而全平台。`,
+      followUp: [{ q: "OneID 如何解决跨端用户识别？", a: "实体解析思路：用手机号、登录账号、设备 ID 等多源标识建映射图，边按证据强度分级（登录态强证据、设备指纹弱证据），图连通分量即同一实体；规则要可解释、可回溯，并配误差评估与人工仲裁出口。" }, { q: "OneData 为什么容易落地失败？", a: "常见死因是把它做成平台项目而非治理工程：没有明确的数据 Owner 和考核，标准停留在文档；老链路改造成本高、业务看不到收益；正确姿势是高价值域试点、把标准嵌进研发流程与平台校验，用复用收益换支持。" }], tags: ["OneData", "OneModel", "OneID", "OneMetric"]
+    },
+    {
+      id: "MET-003", category: "指标体系", question: "如何保障不同报表中的指标口径一致？", frequency: 5,
+      answer: `①指标必须有唯一编码，明确业务含义、公式、粒度、维度、时间、过滤、单位、数据源和负责人，并经过业务审批及版本管理。②公共原子事实和一致性维度统一产出，报表通过语义层或指标服务复用定义，禁止复制 SQL。③变更做影响分析、双跑对账和兼容发布，持续监控同名异义与异名同义。`,
+      detail: `口径一致不等于所有场景只能有一个指标。例如“支付金额”可有下单口径、财务结算口径，但必须明确命名、适用边界和映射关系。指标平台要能从指标追溯到模型字段、任务和报表消费者。`,
+      followUp: [{ q: "业务方坚持使用自己的口径怎么办？", a: "不强行统一，做显式多口径：先评审差异的业务合理性——合理就注册为不同指标（命名显式区分财务口径、业务口径）并声明映射关系；不合理就拿数据证明分歧成本推动收敛；真正要杜绝的是同名异义暗存。" }, { q: "指标变更如何保证历史可比？", a: "版本化加双跑：新旧口径并行计算一个观察期，发布差异说明和新旧值映射；历史是否回刷要写清（财务类通常回刷，运营类可只向前生效）；变更记录进指标字典，保证任何时点能解释当时口径。" }], tags: ["指标口径", "语义层", "版本管理"]
+    },
+    {
+      id: "MET-004", category: "指标体系", question: "设计指标体系的一般步骤是什么？", frequency: 4,
+      answer: `①从业务目标和价值链出发，划分主题域与业务过程，梳理核心对象、事件和分析场景。②定义原子指标、统计周期、修饰词、维度和衍生公式，建立指标树与命名编码。③映射到权威事实和维度模型，明确更新频率、质量规则、权限及负责人。④评审上线后统计使用率，持续合并重复和下线失效指标。`,
+      detail: `不能从现有报表字段倒推后就结束，否则会复制历史混乱。指标树应说明结果指标和过程指标的驱动关系。建设优先覆盖核心决策场景，再扩展长尾，避免一次性定义几千个无人使用的指标。`,
+      followUp: [{ q: "指标树和指标字典有什么区别？", a: "指标树讲结构关系：北极星到结果指标到过程指标的驱动分解，回答“指标之间什么关系”；指标字典是定义注册表，记录每个指标的口径、公式、负责人、版本，回答“每个指标是什么”；树管脉络，字典管定义。" }, { q: "如何治理长期无人使用的指标？", a: "先度量再处置：用平台访问统计找出零使用指标，公示后降级——停每日产出、保留定义按需计算，而不是直接删除；同时复盘入口：新指标立项必须回答“谁在什么决策里用它”，从源头控制膨胀。" }], tags: ["指标体系", "指标树", "业务过程"]
+    },
+    {
+      id: "MET-005", category: "指标体系", question: "什么是北极星指标？如何为业务选择？", frequency: 4,
+      answer: `①北极星指标是在一定阶段最能代表用户获得核心价值、并能驱动长期业务增长的单一核心度量。②选择时要求与用户价值强相关、可持续、可行动、可拆解且不易被短期操纵，如电商不宜只看 GMV。③需配套护栏指标监控利润、质量和风险，并随业务阶段审视，而非永久不变。`,
+      detail: `内容产品可关注有效消费时长而非纯点击，SaaS 可关注活跃付费账户的核心功能使用。北极星指标需拆成获客、激活、留存等驱动指标，团队才能行动；护栏指标防止为提升主指标牺牲退款率或体验。`,
+      followUp: [{ q: "GMV 为什么可能不是好的北极星指标？", a: "它可被短期手段操纵且与用户价值脱钩：补贴能冲 GMV 但牺牲利润和复购，退货也被掩盖；好的北极星要反映用户获得的核心价值（成交买家数、有效消费时长）；GMV 更适合当结果指标或护栏指标的一员。" }, { q: "北极星指标可以有多个吗？", a: "原则上一个：北极星的价值就在聚焦和取舍，多个等于没有；多元化业务（双边市场、多产品线）可按业务单元各设一个，但同一团队同一阶段只能有一个，其余全部归入护栏指标。" }], tags: ["北极星指标", "用户价值", "护栏指标"]
+    },
+    {
+      id: "MET-006", category: "指标体系", question: "指标中的统计周期、业务日期和数据时间应该如何定义？", frequency: 4,
+      answer: `①统计周期说明自然日、滚动 7 日、月累计等窗口及开闭区间；业务日期按业务发生语义归属，处理时间只表示数据何时到达。②必须统一时区、跨日边界和迟到截止时间，明确当天数据是实时暂估还是最终值。③累计、同比、环比需指定可比日历，节假日或财务月不能默认按简单日期偏移。`,
+      detail: `例如海外交易统一存 UTC，但报表按门店时区归属自然日；同一订单可能在 UTC 与北京时间落入不同日期。T+1 最终口径要声明封板时间，迟到数据是回补历史还是计入到达日会直接影响趋势。`,
+      followUp: [{ q: "滚动 7 日和自然周有什么差异？", a: "窗口对齐方式不同：滚动 7 日以当天为终点向前滑，每天口径一致但跨周混合；自然周按周一到周日对齐，未完结的周不能直接和上周比；两者的同比对象和解读方式都要相应调整，混用是周报常见错误。" }, { q: "多时区业务如何分区？", a: "存储与归属分离：底层统一存 UTC 时间戳，业务归属按经营口径（如门店当地自然日）在 ETL 中转换出业务日期再分区；别把服务器时区当业务时区，跨日订单的归属规则必须写进指标定义。" }], tags: ["统计周期", "业务日期", "时区"]
+    },
+    {
+      id: "MET-007", category: "指标体系", question: "指标平台或语义层应该提供哪些核心能力？", frequency: 4,
+      answer: `①以结构化方式管理指标、维度、口径、版本、负责人和权限，并绑定底层模型及字段血缘。②根据查询请求统一生成 SQL，支持维度下钻、时间窗口、缓存、预聚合和多引擎路由。③提供审批、影响分析、质量监控、API/BI 服务和使用度量。平台应约束公共口径，同时允许受治理的场景化扩展。`,
+      detail: `语义层把“指标定义”与“具体报表 SQL”分离，同一指标可被 BI、API 和应用复用。难点是不同事实粒度 Join、非可加指标、权限下推与查询成本。平台不能掩盖底层模型问题，仍需可靠事实和一致维度。`,
+      followUp: [{ q: "语义层如何处理不同粒度事实？", a: "禁止裸连：语义层应感知各事实表的粒度声明，查询涉及多事实时先各自按请求维度聚合、再按共同维度合并（drill-across）；底层模型做不到的，要在建模层补公共汇总，而不是生成会放大指标的 join SQL。" }, { q: "预聚合命中失败时怎么办？", a: "透明回退：路由层判断预聚合表是否覆盖查询的维度与指标，不覆盖就回落明细现算，并记录未命中原因反哺预聚合设计；对用户只暴露“慢”，绝不暴露“错”——预聚合是加速层，不是语义层。" }], tags: ["指标平台", "语义层", "指标服务"]
+    },
+
+    {
+      id: "PRJ-001", category: "项目与开放题", question: "面试中如何用 STAR 法则讲一个数仓项目？", frequency: 5,
+      answer: `①S 交代业务背景、数据规模、原有痛点和约束；T 说明你负责的明确目标及量化指标。②A 是重点，按方案选型、模型设计、关键难点、取舍和协作讲自己的行动，不只罗列组件。③R 用时效、准确率、成本、复用率等结果量化，并补充复盘与后续优化。全程围绕一条主线，可接受追问。`,
+      detail: `一个 3 分钟版本可按 20% 背景、10% 任务、55% 行动、15% 结果分配。避免说“我们用了 Hadoop 全家桶”，要说为什么这样选、你具体做了什么、如何验证。准备架构、模型、质量、性能和故障五类追问证据。`,
+      followUp: [{ q: "项目中最难的问题是什么？", a: "选有决策含量的难：不是“数据量大”，而是权衡型难题（一致性与时效的取舍、历史口径迁移）；按难点、备选方案、你的判断、验证、结果来讲，落点是你个人的贡献而非团队成绩单。" }, { q: "如果重做一次你会改什么？", a: "这题考复盘能力：选一个真实但不致命的改进点（如更早引入数据契约、先建质量基线再动手），说明当时约束下选择的合理性和现在认知的变化——“诚实加成长”就是最佳结构，别自我否定也别假装完美。" }], tags: ["STAR", "项目表达", "量化结果"]
+    },
+    {
+      id: "PRJ-002", category: "项目与开放题", question: "线上发现两个报表数据不一致，你会如何排查？", frequency: 5,
+      answer: `①先冻结问题范围：指标、日期、维度、差异量、版本和查询时间，确认是否同口径、同权限、同刷新时点。②沿血缘从报表到 ADS、DWS、DWD、ODS 分层对账，按业务键下钻，检查重复关联、过滤、迟到、时区、精度和任务版本。③定位后止损、幂等修复并回刷，完成影响通知、复盘和质量规则补充。`,
+      detail: `先找“最早出现差异的层”，能快速缩小范围。对总量差异做差集和分桶哈希；对部分维度差异检查维表版本与 Join 基数。不要一开始重跑所有任务，这可能覆盖证据且扩大影响。`,
+      followUp: [{ q: "如果源系统数据也在变化怎么对账？", a: "取同一逻辑时点：记录源端水位（时间戳或 binlog 位点）与数仓批次水位，只比对水位一致的部分，期间变化归入下一批次；或用源端一致性快照导出；财务口径以结算凭证为权威锚点。" }, { q: "如何快速判断是重复还是漏数？", a: "先看方向再定性质：目标比源多，查重复（主键分组计数、join 放大、任务重跑）；目标比源少，查漏数（过滤条件、join 丢行、分区缺失、迟到未回补）；差集一拉，性质立判。" }], tags: ["数据不一致", "排障", "对账", "血缘"]
+    },
+    {
+      id: "PRJ-003", category: "项目与开放题", question: "如何完成一次数仓模型重构和历史回刷？", frequency: 5,
+      answer: `①先基于血缘、查询和质量数据识别痛点，明确新模型粒度、口径、兼容范围及收益，冻结变更方案。②新旧链路双跑，按日期、主键、金额和分布对账；历史回刷使用版本化代码、历史维度和隔离资源，按依赖拓扑分批执行。③消费者灰度切换并观察 SLA，保留回滚窗口，确认无依赖后再下线旧表。`,
+      detail: `回刷最容易错在拿当前维度解释历史、代码与当时口径不一致、覆盖在线分区。应记录每批输入快照、代码版本和输出批次，先小日期验证再扩展。兼容视图可降低字段迁移成本，但应设明确下线日期。`,
+      followUp: [{ q: "历史维度不完整时如何回刷？", a: "三个补救层次：有 ODS 或快照就从源头重建历史维度版本；只有当前维度时，历史事实按就近版本或未知键处理，并显式标注口径损失；关键报表无法接受的，和业务协商不回刷或只回刷可追溯区间——别硬刷出“看似正确”的假历史。" }, { q: "双跑结果有少量合法差异怎么判断？", a: "先定义合法差异白名单：时间戳精度、浮点舍入、迟到数据窗口、明确的口径修正点；逐条差异分类归因，落在白名单内且有量化解释的放行，其余必须清零才能切流。" }], tags: ["模型重构", "历史回刷", "双跑", "灰度"]
+    },
+    {
+      id: "PRJ-004", category: "项目与开放题", question: "让你介绍一个实时数仓项目，你会讲哪些核心内容？", frequency: 5,
+      answer: `①先讲业务时效目标、峰值吞吐、数据源和消费场景，再给出 CDC/日志→Kafka→Flink→OLAP 的主链路及分层。②重点说明事件模型、Watermark、状态、Checkpoint、幂等 Sink、维度关联和流批校准。③用端到端延迟、可用性、准确率、峰值容量和资源成本量化结果，并准备一次故障案例。`,
+      detail: `架构图不是组件清单，要标出数据流、状态存储、容错边界和 SLA。面试官常追问“为什么不用离线”“重复与迟到怎么办”“维度更新怎么办”“峰值如何扩容”，回答要回到业务约束和观测数据。`,
+      followUp: [{ q: "为什么选择 Flink 而不是 Spark Streaming？", a: "按真实约束讲三点：真正的逐事件处理与事件时间语义（Spark Streaming 是微批）、大状态管理（RocksDB 状态后端加 Checkpoint）、Exactly-Once 与窗口生态的成熟度；同时承认 Spark 在流批统一和生态上的优势，选型讲约束不讲信仰。" }, { q: "实时与离线不一致时以谁为准？", a: "分时段回答：最终一致性以离线 T+1 为准——它处理迟到、修正、去重最完整；实时结果是“准最终态”，服务时效场景；关键是两套共享同一口径定义，差异有监控和收敛机制，而不是出了事再扯皮。" }], tags: ["实时项目", "架构表达", "SLA"]
+    },
+    {
+      id: "PRJ-005", category: "项目与开放题", question: "核心 T+1 任务延迟，距离 SLA 只剩一小时，你怎么处理？", frequency: 5,
+      answer: `①先确认影响范围和关键路径，依据监控判断是上游未到、资源排队、倾斜、节点故障还是代码退化，并立即通知相关方。②优先恢复：扩容或换队列、隔离热点、从安全点重跑，必要时启用经过预案验证的降级数据。③持续更新预计时间；恢复后补齐全量校验、修正降级结果并复盘根因、检测和预案。`,
+      detail: `应急时不要边猜边改生产代码。先保留日志和运行指标，选择可逆操作。降级方案可能是沿用昨日非核心维度、先产核心指标后补长尾，但财务等场景不可擅自给错数，必须由业务责任人确认。`,
+      followUp: [{ q: "哪些数据可以降级，谁来决定？", a: "按数据等级事先划清：核心财务、考核指标不可降级，宁可延迟；非核心维度、长尾报表可用昨日数据降级；决定权在数据 Owner 加业务责任人，且写进预案——应急时只执行预案，不现场发明降级。" }, { q: "资源扩容仍无效下一步怎么办？", a: "说明瓶颈不在资源：回到关键路径——上游数据未到（扩容无用）、代码退化（回滚版本）、单 key 倾斜（扩容对单点无效）、存储或元数据服务故障；“扩容无效”这个实证本身就是最重要的诊断信息。" }], tags: ["SLA", "故障处理", "降级"]
+    },
+    {
+      id: "PRJ-006", category: "项目与开放题", question: "请讲一个你解决 SQL 性能问题的完整思路。", frequency: 4,
+      answer: `①先建立运行时长、扫描量、Shuffle、Task 分布和资源基线，用 EXPLAIN 定位瓶颈而非直接调参。②若是数据量问题做分区裁剪、过滤下推、预聚合；若是 Join 或聚合问题处理广播、倾斜、基数放大和分区数；再治理小文件和存储格式。③用同一输入对账结果并压测，量化耗时与资源下降。`,
+      detail: `面试最好提供具体数字，例如“日任务从 70 分钟降到 18 分钟，Shuffle 从 4TB 降到 900GB”。同时说明为什么原 SQL 慢、每一步证据、方案代价和如何防止回归，而不是只说开启某个参数。`,
+      followUp: [{ q: "优化后结果如何证明完全一致？", a: "同一输入双跑对账：行数、主键集合、关键指标（金额、计数）全等，维度组合级抽样比对；边界样本重点测（null、跨日、重复事件）；有条件就灰度并行跑几天再切流，把“应该没错”变成“证明没错”。" }, { q: "如果只能改一个地方你先改什么？", a: "改数据量而不是改参数：先做扫描裁剪（分区、列、过滤下推），这是多数慢 SQL 的最大杠杆；讲出你的依据——EXPLAIN 里扫描行数占比最高，而不是背“优化先看 Join”的口诀。" }], tags: ["性能优化", "EXPLAIN", "量化"]
+    },
+    {
+      id: "PRJ-007", category: "项目与开放题", question: "业务需求频繁变化，数仓模型如何兼顾稳定与敏捷？", frequency: 4,
+      answer: `①稳定层围绕业务过程、原子事实和一致维度建设，避免跟随报表布局变化；易变展示逻辑留在语义层或 ADS。②通过契约、版本、兼容字段和影响分析控制公共模型变更，小需求可用视图或配置快速交付。③定期根据复用率识别应下沉的公共逻辑，灰度迁移消费者，做到核心稳定、边缘敏捷。`,
+      detail: `“全部做宽表”短期快但长期口径失控，“所有需求都先改公共层”又会拖慢交付。可采用双速治理：高复用、高风险逻辑严格评审，场景化逻辑允许在受控沙盒快速验证，成熟后再产品化下沉。`,
+      followUp: [{ q: "如何判断一段逻辑应该下沉？", a: "三问判断：被两个以上消费方复用吗、属于统一业务定义吗、出错影响面广吗；全是就下沉公共层；展示层特有逻辑（排序、格式、图表组装）永不下沉；用复用率数据定期复审——下沉是持续演进，不是一次设计。" }, { q: "公共字段废弃如何推进消费者迁移？", a: "流程化推进：血缘拉出全部消费者名单，发废弃公告并设迁移期（新旧字段双写并行），提供迁移文档与支持，到期旧字段先只读后下线；核心是把“通知”落成可追踪的迁移任务清单，而不是群发了事。" }], tags: ["模型演进", "敏捷", "数据契约"]
+    }
+  ];
+
+  const CATEGORIES = [
+    "数仓基础概念", "数仓分层架构", "建模方法", "事实表设计", "维度表设计", "数据同步", "SQL 与数据开发",
+    "高频 SQL 手撕题", "大数据组件原理", "实时数仓", "数据质量与治理", "指标体系", "项目与开放题"
+  ];
+  const STORAGE_KEY = "dw-interview-assistant:v1";
+  const STATUS_LABELS = { unlearned: "未学习", learning: "学习中", mastered: "已掌握" };
+  const defaultState = { statuses: {}, favorites: [], theme: "system", last: { questionId: null, scrollY: 0 }, openCategories: {} };
+  const memory = {
+    category: "all", minFrequency: 1, status: "all", favoriteOnly: false, search: "",
+    expandedAnswers: new Set(), expandedDetails: new Set(), interviewQueue: [], interviewIndex: -1,
+    interviewSession: { revealed: new Set(), marked: {}, completed: false }
+  };
+  const byId = new Map(QUESTIONS.map(q => [q.id, q]));
+  let toastTimer, searchTimer, lastFocusedBeforeModal;
+  let storageHealthy = true, storageWarningShown = false, lastPersistedPosition;
+
+  function safeLoad() {
+    let raw;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (error) {
+      storageHealthy = false;
+      return structuredCloneSafe(defaultState);
+    }
+    if (!raw) return structuredCloneSafe(defaultState);
+    try {
+      const parsed = JSON.parse(raw);
+      const statuses = {};
+      Object.entries(parsed.statuses || {}).forEach(([id, value]) => {
+        if (byId.has(id) && STATUS_LABELS[value]) statuses[id] = value;
+      });
+      return {
+        statuses,
+        favorites: Array.isArray(parsed.favorites) ? parsed.favorites.filter(id => byId.has(id)) : [],
+        theme: ["system", "light", "dark"].includes(parsed.theme) ? parsed.theme : "system",
+        last: parsed.last && typeof parsed.last === "object" ? { questionId: byId.has(parsed.last.questionId) ? parsed.last.questionId : null, scrollY: Number(parsed.last.scrollY) || 0 } : { questionId: null, scrollY: 0 },
+        openCategories: parsed.openCategories && typeof parsed.openCategories === "object" ? parsed.openCategories : {}
+      };
+    } catch (error) {
+      return structuredCloneSafe(defaultState);
+    }
+  }
+  function structuredCloneSafe(value) { return JSON.parse(JSON.stringify(value)); }
+  let state = safeLoad();
+  lastPersistedPosition = { ...state.last };
+  function setStorageHealth(healthy) {
+    storageHealthy = healthy;
+    const note = document.getElementById("storageNote");
+    if (healthy) {
+      if (note) { note.textContent = "进度保存在当前浏览器 · 离线可用"; note.classList.remove("storage-warning"); }
+      storageWarningShown = false;
+      return;
+    }
+    if (note) { note.textContent = "当前浏览器无法持久保存进度"; note.classList.add("storage-warning"); }
+    if (!storageWarningShown) { storageWarningShown = true; showToast("进度保存失败：请检查隐私模式或浏览器存储空间", 3600); }
+  }
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      lastPersistedPosition = { ...state.last };
+      setStorageHealth(true);
+      return true;
+    } catch (error) {
+      setStorageHealth(false);
+      return false;
+    }
+  }
+  function getStatus(id) { return state.statuses[id] || "unlearned"; }
+  function isFavorite(id) { return state.favorites.includes(id); }
+  function updateStatusControls(id) {
+    const card = document.getElementById(`q-${id}`);
+    if (!card) return;
+    card.dataset.status = getStatus(id);
+    card.querySelectorAll('[data-action="status"]').forEach(button => button.classList.toggle("active", button.dataset.value === getStatus(id)));
+  }
+  function updateFavoriteControls(id) {
+    document.querySelectorAll(`.card [data-action="favorite"][data-id="${id}"]`).forEach(button => {
+      const active = isFavorite(id);
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-label", active ? "取消收藏" : "收藏");
+      button.innerHTML = starIcon(active);
+    });
+  }
+  function rerenderAfterFilteredMutation() {
+    renderQuestionsPreservingScroll();
+    if (document.getElementById("interviewModal").hidden) requestAnimationFrame(() => document.getElementById("resultCount").focus());
+  }
+  function setStatus(id, value) {
+    if (getStatus(id) === value) return;
+    if (value === "unlearned") delete state.statuses[id]; else state.statuses[id] = value;
+    saveState(); renderDashboard(); renderSidebar();
+    if (memory.status === "all") updateStatusControls(id); else rerenderAfterFilteredMutation();
+  }
+  function toggleFavorite(id) {
+    state.favorites = isFavorite(id) ? state.favorites.filter(item => item !== id) : [...state.favorites, id];
+    saveState(); renderDashboard(); renderSidebar();
+    if (memory.category === "favorites" || memory.favoriteOnly) rerenderAfterFilteredMutation(); else updateFavoriteControls(id);
+  }
+  function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+  function escapeRegex(value) { return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function tokens() { return memory.search.trim().toLowerCase().split(/\s+/).filter(Boolean); }
+  function highlight(value) {
+    const terms = tokens();
+    if (!terms.length) return escapeHtml(value);
+    const regex = new RegExp(`(${terms.sort((a,b) => b.length-a.length).map(escapeRegex).join("|")})`, "gi");
+    return String(value).split(regex).map(part => terms.some(term => part.toLowerCase() === term) ? `<mark>${escapeHtml(part)}</mark>` : escapeHtml(part)).join("");
+  }
+  function renderRichText(value) {
+    const regex = /```(?:sql)?\s*\n?([\s\S]*?)```/gi;
+    let output = "", cursor = 0, match;
+    while ((match = regex.exec(value)) !== null) {
+      output += `<div class="detail-text">${highlight(value.slice(cursor, match.index)).replace(/\n/g, "<br>")}</div>`;
+      output += `<pre><code>${highlight(match[1].trim())}</code></pre>`;
+      cursor = regex.lastIndex;
+    }
+    output += `<div class="detail-text">${highlight(value.slice(cursor)).replace(/\n/g, "<br>")}</div>`;
+    return output;
+  }
+  function starIcon(filled, className = "svg-icon") {
+    return `<svg class="${className}${filled ? " filled" : ""}" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>`;
+  }
+  function stars(n) { return Array.from({ length: 5 }, (_, index) => starIcon(index < n, "rating-star")).join(""); }
+  function filteredQuestions() {
+    const terms = tokens();
+    return QUESTIONS.filter(q => {
+      if (memory.category !== "all" && memory.category !== "favorites" && q.category !== memory.category) return false;
+      if ((memory.category === "favorites" || memory.favoriteOnly) && !isFavorite(q.id)) return false;
+      if (q.frequency < memory.minFrequency) return false;
+      if (memory.status !== "all" && getStatus(q.id) !== memory.status) return false;
+      if (terms.length) {
+        const haystack = `${q.question} ${q.answer} ${q.detail} ${q.followUp.map(f => `${f.q} ${f.a}`).join(" ")} ${q.tags.join(" ")}`.toLowerCase();
+        if (!terms.every(term => haystack.includes(term))) return false;
+      }
+      return true;
+    });
+  }
+  function renderDashboard() {
+    const mastered = QUESTIONS.filter(q => getStatus(q.id) === "mastered").length;
+    const learning = QUESTIONS.filter(q => getStatus(q.id) === "learning").length;
+    const percent = Math.round(mastered / QUESTIONS.length * 100);
+    document.getElementById("progressPercent").textContent = `${percent}%`;
+    document.getElementById("progressRing").style.setProperty("--pct", `${percent}%`);
+    document.getElementById("statRow").innerHTML = `<div class="stat"><b>${QUESTIONS.length}</b><span>题库</span></div><div class="stat"><b>${learning}</b><span>学习中</span></div><div class="stat"><b>${mastered}</b><span>已掌握</span></div><div class="stat"><b>${state.favorites.length}</b><span>收藏</span></div>`;
+    document.getElementById("moduleProgress").innerHTML = CATEGORIES.map(category => {
+      const list = QUESTIONS.filter(q => q.category === category);
+      const done = list.filter(q => getStatus(q.id) === "mastered").length;
+      const pct = Math.round(done / list.length * 100);
+      return `<div class="module-item" title="${escapeHtml(category)}：${done}/${list.length}"><div class="module-meta"><span>${escapeHtml(category)}</span><span>${done}/${list.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+    }).join("");
+  }
+  function renderSidebar() {
+    document.getElementById("allCount").textContent = QUESTIONS.length;
+    document.getElementById("favoriteCount").textContent = state.favorites.length;
+    document.querySelectorAll("[data-nav]").forEach(btn => btn.classList.toggle("active", btn.dataset.nav === memory.category));
+    document.getElementById("categoryNav").innerHTML = CATEGORIES.map(category => {
+      const list = QUESTIONS.filter(q => q.category === category);
+      const done = list.filter(q => getStatus(q.id) === "mastered").length;
+      const hasSavedChoice = Object.prototype.hasOwnProperty.call(state.openCategories, category);
+      const open = hasSavedChoice ? Boolean(state.openCategories[category]) : memory.category === category;
+      return `<details class="category-group" data-category-group="${escapeHtml(category)}" ${open ? "open" : ""}>
+        <summary class="category-head"><span class="category-name">${escapeHtml(category)}</span><span class="category-count">${done}/${list.length}</span></summary>
+        <div class="question-links">${list.map(q => `<button class="question-link" data-jump="${q.id}" title="${escapeHtml(q.question)}">${escapeHtml(q.question)}</button>`).join("")}</div>
+      </details>`;
+    }).join("");
+  }
+  function statusButtons(id) {
+    const current = getStatus(id);
+    return Object.entries(STATUS_LABELS).map(([value, label]) => `<button class="status-btn ${current === value ? "active" : ""}" data-action="status" data-id="${id}" data-value="${value}">${label}</button>`).join("");
+  }
+  function renderCard(q, index = 0) {
+    const answerOpen = memory.expandedAnswers.has(q.id);
+    const detailOpen = memory.expandedDetails.has(q.id);
+    return `<article class="card" id="q-${q.id}" data-question-id="${q.id}" data-status="${getStatus(q.id)}" style="--i:${index}">
+      <div class="card-head">
+        <div class="meta-row"><span class="category-pill">${escapeHtml(q.category)}</span><span class="qid">${q.id}</span><span class="stars" title="${q.frequency} 星" aria-label="考察频率 ${q.frequency} 星">${stars(q.frequency)}</span><button class="favorite ${isFavorite(q.id) ? "active" : ""}" data-action="favorite" data-id="${q.id}" aria-label="${isFavorite(q.id) ? "取消收藏" : "收藏"}">${starIcon(isFavorite(q.id))}</button></div>
+        <h3 class="question">${highlight(q.question)}</h3>
+        <div class="card-controls"><div class="status-group">${statusButtons(q.id)}</div><button class="btn small-btn reveal-btn" data-action="answer" data-id="${q.id}">${answerOpen ? "收起答案" : "显示答案"}</button></div>
+      </div>
+      <div class="answer-panel" ${answerOpen ? "" : "hidden"}>
+        <div class="answer-block"><div class="answer-label">标准答案 · 背诵版</div><div class="answer-text">${highlight(q.answer).replace(/\n/g,"<br>")}</div></div>
+        <button class="btn small-btn detail-toggle" data-action="detail" data-id="${q.id}">${detailOpen ? "收起详细解析" : "展开详细解析"}</button>
+        <div class="detail-block" ${detailOpen ? "" : "hidden"}><div class="detail-label">详细解析</div>${renderRichText(q.detail)}<div class="detail-label" style="margin-top:14px">常见追问 · 点击展开思路</div><ol class="follow-up">${q.followUp.map(item => `<li><details class="fq"><summary>${highlight(item.q)}</summary><div class="fq-hint">${highlight(item.a)}</div></details></li>`).join("")}</ol><div class="tag-row">${q.tags.map(tag => `<span class="tag">#${highlight(tag)}</span>`).join("")}</div></div>
+      </div>
+    </article>`;
+  }
+  function renderQuestions() {
+    const list = filteredQuestions();
+    const title = memory.category === "all" ? "全部题目" : memory.category === "favorites" ? "我的收藏" : memory.category;
+    document.getElementById("viewTitle").textContent = title;
+    document.getElementById("resultCount").textContent = `共 ${list.length} 题`;
+    document.getElementById("searchHint").textContent = memory.search ? `关键词：${memory.search}` : "";
+    const box = document.getElementById("questionList");
+    box.innerHTML = list.length ? list.map(renderCard).join("") : `<div class="empty"><h3>没有匹配的题目</h3><p>试试降低星级、切换掌握状态或清空关键词。</p><button class="btn" data-action="reset">重置筛选</button></div>`;
+  }
+  function renderQuestionsPreservingScroll() { const y = window.scrollY; renderQuestions(); requestAnimationFrame(() => window.scrollTo(0, y)); }
+  function renderAll() { renderDashboard(); renderSidebar(); renderQuestions(); }
+  function showToast(message, duration = 1800) { const el = document.getElementById("toast"); el.textContent = message; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), duration); }
+  function resetFilters() {
+    memory.category = "all"; memory.minFrequency = 1; memory.status = "all"; memory.favoriteOnly = false; memory.search = "";
+    clearTimeout(searchTimer); document.getElementById("searchInput").value = ""; document.getElementById("frequencyFilter").value = "1"; document.getElementById("statusFilter").value = "all"; document.getElementById("favoriteOnly").checked = false;
+    renderSidebar(); renderQuestions();
+  }
+  function applyTheme() {
+    const systemDark = themeMedia.matches;
+    const resolved = state.theme === "system" ? (systemDark ? "dark" : "light") : state.theme;
+    document.documentElement.dataset.theme = resolved;
+    const labels = { system: "跟随系统", light: "浅色", dark: "深色" };
+    const icons = {
+      system: `<svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16A8 8 0 0 0 12 4Z"/></svg>`,
+      light: `<svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+      dark: `<svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.1A8 8 0 0 1 8.9 4a8 8 0 1 0 11.1 11.1Z"/></svg>`
+    };
+    document.getElementById("themeIcon").innerHTML = icons[state.theme]; document.getElementById("themeText").textContent = labels[state.theme]; document.getElementById("themeBtn").setAttribute("aria-label", `当前主题：${labels[state.theme]}，点击切换`);
+  }
+  function cycleTheme() { const order = ["system", "light", "dark"]; state.theme = order[(order.indexOf(state.theme) + 1) % order.length]; saveState(); applyTheme(); }
+  function showInterviewView(view) {
+    document.getElementById("interviewSetup").hidden = view !== "setup";
+    document.getElementById("interviewCard").hidden = view !== "card";
+    document.getElementById("interviewSummary").hidden = view !== "summary";
+  }
+  function openInterview() {
+    lastFocusedBeforeModal = document.activeElement;
+    document.getElementById("interviewModal").hidden = false; document.body.classList.add("modal-open"); document.getElementById("appRoot").inert = true;
+    if (memory.interviewSession.completed) { showInterviewView("summary"); renderInterviewSummary(); }
+    else if (currentInterview()) { showInterviewView("card"); renderInterviewQuestion(); }
+    else showInterviewView("setup");
+    setTimeout(() => document.getElementById("closeInterviewBtn").focus(), 0);
+  }
+  function closeInterview() {
+    const paused = Boolean(currentInterview()) && !memory.interviewSession.completed;
+    document.getElementById("interviewModal").hidden = true; document.body.classList.remove("modal-open"); document.getElementById("appRoot").inert = false;
+    document.getElementById("openInterviewBtn").textContent = memory.interviewSession.completed ? "查看复盘" : paused ? "继续面试" : "模拟面试";
+    (lastFocusedBeforeModal?.isConnected ? lastFocusedBeforeModal : document.getElementById("openInterviewBtn")).focus();
+    if (paused) showToast("本轮进度已保留，下次可继续", 2400);
+  }
+  function shuffle(items) { const list = [...items]; for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; } return list; }
+  function startInterview() {
+    const chosen = [...document.querySelectorAll(".interview-category:checked")].map(input => input.value);
+    const min = Number(document.getElementById("interviewFrequency").value);
+    if (!chosen.length) { showToast("请至少选择一个模块"); return; }
+    memory.interviewQueue = shuffle(QUESTIONS.filter(q => chosen.includes(q.category) && q.frequency >= min)); memory.interviewIndex = 0;
+    memory.interviewSession = { revealed: new Set(), marked: {}, completed: false };
+    if (!memory.interviewQueue.length) { showToast("当前范围内没有题目"); return; }
+    showInterviewView("card"); renderInterviewQuestion();
+  }
+  function currentInterview() { return memory.interviewQueue[memory.interviewIndex]; }
+  function renderInterviewQuestion() {
+    const q = currentInterview(); if (!q) return;
+    document.getElementById("interviewCounter").textContent = `本轮第 ${memory.interviewIndex + 1} / ${memory.interviewQueue.length} 题 · 剩余 ${memory.interviewQueue.length - memory.interviewIndex - 1} 题`;
+    document.getElementById("interviewCategory").textContent = q.category; document.getElementById("interviewStars").innerHTML = stars(q.frequency); document.getElementById("interviewStars").setAttribute("aria-label", `考察频率 ${q.frequency} 星`); document.getElementById("interviewQuestion").textContent = q.question;
+    const fav = document.getElementById("interviewFavorite"); fav.innerHTML = starIcon(isFavorite(q.id)); fav.classList.toggle("active", isFavorite(q.id)); fav.setAttribute("aria-label", isFavorite(q.id) ? "取消收藏" : "收藏此题");
+    const revealed = memory.interviewSession.revealed.has(q.id);
+    document.getElementById("interviewAnswer").textContent = q.answer; document.getElementById("interviewAnswer").hidden = !revealed;
+    document.getElementById("revealInterviewBtn").hidden = revealed; document.getElementById("nextInterviewBtn").hidden = !revealed;
+    document.getElementById("interviewStatus").innerHTML = statusButtons(q.id);
+  }
+  function revealInterview() {
+    const q = currentInterview(); if (!q) return;
+    memory.interviewSession.revealed.add(q.id);
+    document.getElementById("interviewAnswer").hidden = false; document.getElementById("revealInterviewBtn").hidden = true; document.getElementById("nextInterviewBtn").hidden = false;
+    document.getElementById("nextInterviewBtn").focus();
+  }
+  function nextInterview() {
+    if (memory.interviewIndex >= memory.interviewQueue.length - 1) {
+      memory.interviewSession.completed = true; showInterviewView("summary"); renderInterviewSummary(); document.getElementById("restartInterviewBtn").focus(); return;
+    }
+    memory.interviewIndex++; renderInterviewQuestion();
+  }
+  function renderInterviewSummary() {
+    const seen = Math.min(memory.interviewIndex + 1, memory.interviewQueue.length);
+    const marked = Object.values(memory.interviewSession.marked);
+    const learning = marked.filter(value => value === "learning").length;
+    const mastered = marked.filter(value => value === "mastered").length;
+    document.getElementById("interviewSummaryText").textContent = `本轮共抽取 ${memory.interviewQueue.length} 题，已完成 ${seen} 题。标记统计仅计算本轮主动调整过的题目。`;
+    document.getElementById("interviewSummaryStats").innerHTML = `<div class="summary-stat"><b>${memory.interviewSession.revealed.size}</b>已翻答案</div><div class="summary-stat"><b>${learning}</b>标记学习中</div><div class="summary-stat"><b>${mastered}</b>标记已掌握</div>`;
+  }
+  function resetInterviewSession() {
+    memory.interviewQueue = []; memory.interviewIndex = -1; memory.interviewSession = { revealed: new Set(), marked: {}, completed: false };
+    document.getElementById("openInterviewBtn").textContent = "模拟面试";
+    showInterviewView("setup"); document.getElementById("startInterviewBtn").focus();
+  }
+  function setupInterviewCategories() {
+    document.getElementById("interviewCategories").innerHTML = CATEGORIES.map(category => `<label class="setup-option"><input class="interview-category" type="checkbox" value="${escapeHtml(category)}" checked> <span>${escapeHtml(category)} <small class="muted">(${QUESTIONS.filter(q => q.category === category).length})</small></span></label>`).join("");
+  }
+  function closeDrawer() { document.body.classList.remove("drawer-open"); }
+  function trapInterviewFocus(event) {
+    const modal = document.getElementById("interviewModal");
+    if (modal.hidden || event.key !== "Tab") return;
+    const focusable = [...modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      .filter(element => !element.closest("[hidden]") && element.getClientRects().length);
+    if (!focusable.length) { event.preventDefault(); document.getElementById("closeInterviewBtn").focus(); return; }
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+  }
+
+  document.getElementById("questionList").addEventListener("click", event => {
+    const target = event.target.closest("[data-action]"); if (!target) return;
+    const { action, id, value } = target.dataset;
+    if (action === "answer") {
+      const open = !memory.expandedAnswers.has(id);
+      open ? memory.expandedAnswers.add(id) : memory.expandedAnswers.delete(id);
+      target.closest(".card").querySelector(".answer-panel").hidden = !open;
+      target.textContent = open ? "收起答案" : "显示答案";
+    }
+    if (action === "detail") {
+      const open = !memory.expandedDetails.has(id);
+      open ? memory.expandedDetails.add(id) : memory.expandedDetails.delete(id);
+      target.closest(".answer-panel").querySelector(".detail-block").hidden = !open;
+      target.textContent = open ? "收起详细解析" : "展开详细解析";
+    }
+    if (action === "favorite") toggleFavorite(id);
+    if (action === "status") setStatus(id, value);
+    if (action === "reset") resetFilters();
+  });
+  document.getElementById("categoryNav").addEventListener("click", event => {
+    const jump = event.target.closest("[data-jump]"); if (!jump) return;
+    memory.category = byId.get(jump.dataset.jump).category; renderSidebar(); renderQuestions(); closeDrawer();
+    requestAnimationFrame(() => document.getElementById(`q-${jump.dataset.jump}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  });
+  document.getElementById("categoryNav").addEventListener("toggle", event => {
+    const details = event.target.closest("[data-category-group]"); if (!details) return;
+    state.openCategories[details.dataset.categoryGroup] = details.open; saveState();
+  }, true);
+  document.querySelector(".side-special").addEventListener("click", event => { const btn = event.target.closest("[data-nav]"); if (!btn) return; memory.category = btn.dataset.nav; renderSidebar(); renderQuestions(); closeDrawer(); window.scrollTo({top:0,behavior:"smooth"}); });
+  document.getElementById("searchInput").addEventListener("input", event => {
+    const value = event.target.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { memory.search = value; renderQuestions(); }, 140);
+  });
+  document.getElementById("frequencyFilter").addEventListener("change", event => { memory.minFrequency = Number(event.target.value); renderQuestions(); });
+  document.getElementById("statusFilter").addEventListener("change", event => { memory.status = event.target.value; renderQuestions(); });
+  document.getElementById("favoriteOnly").addEventListener("change", event => { memory.favoriteOnly = event.target.checked; renderQuestions(); });
+  document.getElementById("expandAllBtn").addEventListener("click", () => { filteredQuestions().forEach(q => memory.expandedAnswers.add(q.id)); renderQuestions(); });
+  document.getElementById("collapseAllBtn").addEventListener("click", () => { filteredQuestions().forEach(q => { memory.expandedAnswers.delete(q.id); memory.expandedDetails.delete(q.id); }); renderQuestions(); });
+  document.getElementById("resetFiltersBtn").addEventListener("click", resetFilters);
+  document.getElementById("mobileFilterToggle").addEventListener("click", event => {
+    const toolbar = event.currentTarget.closest(".toolbar");
+    const open = toolbar.classList.toggle("filters-open");
+    event.currentTarget.setAttribute("aria-expanded", String(open));
+    event.currentTarget.textContent = open ? "收起筛选与批量操作" : "筛选与批量操作";
+  });
+  document.getElementById("themeBtn").addEventListener("click", cycleTheme);
+  document.getElementById("menuBtn").addEventListener("click", () => document.body.classList.add("drawer-open"));
+  document.getElementById("drawerMask").addEventListener("click", closeDrawer);
+  document.getElementById("openInterviewBtn").addEventListener("click", openInterview);
+  document.getElementById("closeInterviewBtn").addEventListener("click", closeInterview);
+  document.getElementById("startInterviewBtn").addEventListener("click", startInterview);
+  document.getElementById("revealInterviewBtn").addEventListener("click", revealInterview);
+  document.getElementById("nextInterviewBtn").addEventListener("click", nextInterview);
+  document.getElementById("restartInterviewBtn").addEventListener("click", resetInterviewSession);
+  document.getElementById("closeSummaryBtn").addEventListener("click", closeInterview);
+  document.getElementById("selectAllInterview").addEventListener("change", event => document.querySelectorAll(".interview-category").forEach(input => input.checked = event.target.checked));
+  document.getElementById("interviewCategories").addEventListener("change", () => { const all = [...document.querySelectorAll(".interview-category")]; document.getElementById("selectAllInterview").checked = all.every(input => input.checked); document.getElementById("selectAllInterview").indeterminate = all.some(input => input.checked) && !all.every(input => input.checked); });
+  document.getElementById("interviewStatus").addEventListener("click", event => {
+    const btn = event.target.closest("[data-action=status]"); if (!btn || getStatus(btn.dataset.id) === btn.dataset.value) return;
+    memory.interviewSession.marked[btn.dataset.id] = btn.dataset.value;
+    setStatus(btn.dataset.id, btn.dataset.value);
+    document.getElementById("interviewStatus").querySelectorAll('[data-action="status"]').forEach(button => button.classList.toggle("active", button.dataset.value === btn.dataset.value));
+  });
+  document.getElementById("interviewFavorite").addEventListener("click", () => {
+    const q = currentInterview(); if (!q) return; toggleFavorite(q.id);
+    const button = document.getElementById("interviewFavorite"), active = isFavorite(q.id);
+    button.innerHTML = starIcon(active); button.classList.toggle("active", active); button.setAttribute("aria-label", active ? "取消收藏" : "收藏此题");
+  });
+  document.addEventListener("keydown", event => {
+    trapInterviewFocus(event);
+    if (event.key !== "Escape") return;
+    if (!document.getElementById("interviewModal").hidden) {
+      if (event.target?.tagName === "SELECT") return;
+      event.preventDefault(); closeInterview();
+    } else closeDrawer();
+  });
+  const themeMedia = matchMedia("(prefers-color-scheme: dark)");
+  const handleSystemThemeChange = () => { if (state.theme === "system") applyTheme(); };
+  if (themeMedia.addEventListener) themeMedia.addEventListener("change", handleSystemThemeChange);
+  else if (themeMedia.addListener) themeMedia.addListener(handleSystemThemeChange);
+  let scrollTimer;
+  function captureLastPosition() {
+    const visible = [...document.querySelectorAll("[data-question-id]")].filter(card => card.getBoundingClientRect().top <= 160).pop();
+    return { questionId: visible?.dataset.questionId || state.last.questionId, scrollY: Math.round(window.scrollY) };
+  }
+  function lastPositionChanged(next) { return next.questionId !== lastPersistedPosition.questionId || Math.abs(next.scrollY - lastPersistedPosition.scrollY) >= 320; }
+  window.addEventListener("scroll", () => {
+    clearTimeout(scrollTimer); scrollTimer = setTimeout(() => {
+      const next = captureLastPosition(); state.last = next; if (lastPositionChanged(next)) saveState();
+    }, 650);
+  }, { passive: true });
+  window.addEventListener("beforeunload", () => {
+    clearTimeout(scrollTimer); const next = captureLastPosition(); state.last = next; if (lastPositionChanged(next)) saveState();
+  });
+
+  applyTheme(); setupInterviewCategories(); renderAll(); if (!storageHealthy) setStorageHealth(false);
+  requestAnimationFrame(() => {
+    if (state.last.questionId && document.getElementById(`q-${state.last.questionId}`)) document.getElementById(`q-${state.last.questionId}`).scrollIntoView({ block: "start" });
+    else if (state.last.scrollY) window.scrollTo(0, state.last.scrollY);
+  });
+  </script>
+</body>
+</html>
